@@ -1,0 +1,20 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bcrypt>=4.3.0",
+    "celery>=5.5.3",
+    "django>=5.2.3",
+    "django-cors-headers>=4.7.0",
+    "djangorestframework>=3.16.0",
+    "djangorestframework-simplejwt>=5.5.0",
+    "isort>=6.0.1",
+    "psycopg2-binary>=2.9.10",
+    "python-decouple>=3.8",
+    "redis>=6.2.0",
+    "requests>=2.32.4",
+    "simplejwt>=2.0.1",
+]
