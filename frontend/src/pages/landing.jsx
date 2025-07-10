@@ -1,10 +1,10 @@
-import { Link } from "react-router";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Shield, Zap, Users, Sparkles } from "lucide-react";
-import { ModeToggle } from "@/components/mode-toggler";
-import { motion } from "motion/react";
+import { Link } from 'react-router';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight, Shield, Zap, Users, Sparkles } from 'lucide-react';
+import { ModeToggle } from '@/components/mode-toggler';
+import { motion } from 'motion/react';
 
 const Landing = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -13,27 +13,27 @@ const Landing = () => {
   const features = [
     {
       icon: Shield,
-      title: "Enterprise Security",
+      title: 'Enterprise Security',
       description:
-        "Built with industry-leading security standards, including OAuth 2.0, JWT tokens, and encrypted data storage.",
-      color: "text-blue-500",
-      gradient: "from-blue-500/10 to-blue-600/10",
+        'Built with industry-leading security standards, including OAuth 2.0, JWT tokens, and encrypted data storage.',
+      color: 'text-blue-500',
+      gradient: 'from-blue-500/10 to-blue-600/10',
     },
     {
       icon: Zap,
-      title: "Lightning Fast",
+      title: 'Lightning Fast',
       description:
-        "Optimized React components with server-side rendering and intelligent caching for sub-second load times.",
-      color: "text-yellow-500",
-      gradient: "from-yellow-500/10 to-yellow-600/10",
+        'Optimized React components with server-side rendering and intelligent caching for sub-second load times.',
+      color: 'text-yellow-500',
+      gradient: 'from-yellow-500/10 to-yellow-600/10',
     },
     {
       icon: Users,
-      title: "Infinitely Scalable",
+      title: 'Infinitely Scalable',
       description:
-        "Architected for growth with microservices, horizontal scaling, and enterprise-grade infrastructure.",
-      color: "text-green-500",
-      gradient: "from-green-500/10 to-green-600/10",
+        'Architected for growth with microservices, horizontal scaling, and enterprise-grade infrastructure.',
+      color: 'text-green-500',
+      gradient: 'from-green-500/10 to-green-600/10',
     },
   ];
 
@@ -54,7 +54,7 @@ const Landing = () => {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 100,
         damping: 15,
         duration: 0.6,
@@ -68,7 +68,7 @@ const Landing = () => {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: 'spring',
         stiffness: 100,
         damping: 15,
         duration: 0.7,
@@ -83,15 +83,13 @@ const Landing = () => {
       transition: {
         duration: 3,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       },
     },
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-
-
       {/* Floating sparkles with improved positioning */}
       <motion.div
         className="absolute top-20 left-16 text-primary/15 hidden md:block"
@@ -119,7 +117,7 @@ const Landing = () => {
 
       {/* Gradient orbs for depth */}
       <div className="absolute top-0 left-0 -z-10 h-96 w-96 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 blur-3xl opacity-50"></div>
-      <div className="absolute bottom-0 right-0 -z-10 h-96 w-96 rounded-full bg-gradient-to-br from-secondary/20 to-primary/20 blur-3xl opacity-50"></div> 
+      <div className="absolute bottom-0 right-0 -z-10 h-96 w-96 rounded-full bg-gradient-to-br from-secondary/20 to-primary/20 blur-3xl opacity-50"></div>
 
       <motion.div
         className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
@@ -129,22 +127,17 @@ const Landing = () => {
       >
         <div className="text-center max-w-5xl mx-auto">
           {/* Header with mode toggle */}
-          <motion.div
-            className="flex items-center justify-center mb-8"
-            variants={itemVariants}
-          >
+          <motion.div className="flex items-center justify-center mb-8" variants={itemVariants}>
             <div className="flex items-center gap-6">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-none">
-                Welcome to{" "}
-                <motion.span
-                  className="text-primary inline-block bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
-                >
+                Welcome to{' '}
+                <motion.span className="text-primary inline-block bg-gradient-to-r from-primary to-primary/80 bg-clip-text">
                   AuthApp
                 </motion.span>
               </h1>
               <motion.div
                 className="flex-shrink-0"
-                transition={{ duration: 0.6, ease: "easeInOut" }}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
               >
                 <ModeToggle />
               </motion.div>
@@ -169,13 +162,9 @@ const Landing = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
-              <Button
-                size="lg"
-                asChild
-                className="text-lg px-8 relative overflow-hidden group"
-              >
+              <Button size="lg" asChild className="text-lg px-8 relative overflow-hidden group">
                 <Link
                   to="/register"
                   className="flex items-center"
@@ -187,7 +176,7 @@ const Landing = () => {
                   <motion.div
                     className="ml-2 relative z-10"
                     animate={{ x: isHovered ? 5 : 0 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                   >
                     <ArrowRight className="h-5 w-5" />
                   </motion.div>
@@ -198,7 +187,7 @@ const Landing = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <Button
                 variant="outline"
@@ -222,7 +211,7 @@ const Landing = () => {
                 variants={cardVariants}
                 whileHover={{
                   y: -8,
-                  transition: { type: "spring", stiffness: 400, damping: 25 },
+                  transition: { type: 'spring', stiffness: 400, damping: 25 },
                 }}
                 className="group h-full"
               >
@@ -230,10 +219,10 @@ const Landing = () => {
                   <CardContent className="p-8 text-center h-full flex flex-col">
                     <motion.div
                       className="flex justify-center mb-6"
-                      whileHover={{ 
+                      whileHover={{
                         scale: 1.1,
                         rotate: [0, -5, 5, 0],
-                        transition: { duration: 0.4 }
+                        transition: { duration: 0.4 },
                       }}
                     >
                       <div
@@ -263,10 +252,7 @@ const Landing = () => {
           </motion.div>
 
           {/* Bottom section with additional visual elements */}
-          <motion.div
-            className="mt-24 pt-12 border-t border-border/40"
-            variants={itemVariants}
-          >
+          <motion.div className="mt-24 pt-12 border-t border-border/40" variants={itemVariants}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

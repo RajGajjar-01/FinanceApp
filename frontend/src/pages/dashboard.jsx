@@ -1,18 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "../contexts/auth-context"
-import { User, Mail, Calendar, Activity } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '../contexts/auth-context';
+import { User, Mail, Calendar, Activity } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen">
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || "User"}!</h1>
-            <p className="text-muted-foreground">Here's what's happening with your account today.</p>
+            <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || 'User'}!</h1>
+            <p className="text-muted-foreground">
+              Here's what's happening with your account today.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -88,7 +89,9 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                     <h4 className="font-medium">Update Profile</h4>
-                    <p className="text-sm text-muted-foreground">Change your personal information</p>
+                    <p className="text-sm text-muted-foreground">
+                      Change your personal information
+                    </p>
                   </div>
                   <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                     <h4 className="font-medium">Security Settings</h4>
@@ -105,7 +108,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
