@@ -6,7 +6,7 @@ import { useNavigate, Link } from 'react-router';
 
 const Dashboard = () => {
   const {user, logout} = useAuth();
-
+  console.log("dsfa");
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

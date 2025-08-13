@@ -1,5 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 const BASE_URL = 'http://localhost:8000';
@@ -15,8 +14,11 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  console.log("render")
-  const [user, setUser] = useState(null);
+  console.log('render');
+  const [user, setUser] = useState(()=>{
+    const stored = localStorage.getItem('userData');
+    return stored ? JSON.parse(stored) : null;
+  });
   const [authToken, setAuthToken] = useState(null);
   const navigate = useNavigate();
 
@@ -29,7 +31,8 @@ export const AuthProvider = ({ children }) => {
 
     instance.interceptors.request.use(
       (config) => {
-        if (authToken && !config.headers?.Authorization) config.headers.Authorization = `Bearer ${authToken}`;
+        if (authToken && !config.headers?.Authorization)
+          config.headers.Authorization = `Bearer ${authToken}`;
         return config;
       },
       (error) => Promise.reject(error)
@@ -67,18 +70,32 @@ export const AuthProvider = ({ children }) => {
     return instance;
   }, [authToken]);
 
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      const cookies = document.cookie.split(';');
+      const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('access_token='));
+
+      if (tokenCookie) {
+        const token = tokenCookie.split('=')[1];
+        setAuthToken(token);
+      }
+    };
+
+    checkExistingAuth();
+  }, []);
+
   const clearAuthData = useCallback(() => {
     setUser(null);
     setAuthToken(null);
   }, []);
 
   const setAuthData = useCallback((response) => {
-    const token = response?.data?.auth?.access_token;
     const userData = response?.data?.user;
 
-    if (token && userData) {
-      setAuthToken(token);
+    if (userData) {
+      localStorage.setItem('userData', JSON.stringify(userData));
       setUser(userData);
+      setAuthToken(document.cookie.split(';')[0].split('=')[1]);
       return true;
     }
     return false;
@@ -100,7 +117,8 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await axios.post(`${BASE_URL}/user/auth/register/`, userData);
-      if (response.data.success) navigate(`/verify-email?email=${encodeURIComponent(userData.email)}`);
+      if (response.data.success)
+        navigate(`/verify-email?email=${encodeURIComponent(userData.email)}`);
       return response;
     } catch (error) {
       return error.response || { data: { success: false, message: 'Registration failed' } };
@@ -110,7 +128,7 @@ export const AuthProvider = ({ children }) => {
   const verifyEmail = async (otpData) => {
     try {
       const response = await axios.post(`${BASE_URL}/user/auth/verify-email/`, otpData, {
-        withCredentials:true,
+        withCredentials: true,
       });
       if (response.data.success) setAuthData(response.data);
       return response;
@@ -124,7 +142,9 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post(`${BASE_URL}/user/auth/resend-verification/`, emailData);
       return response;
     } catch (error) {
-      return error.response || { data: { success: false, message: 'Failed to resend verification' } }
+      return (
+        error.response || { data: { success: false, message: 'Failed to resend verification' } }
+      );
     }
   };
 

@@ -35,7 +35,16 @@ def create_auth_response(user, message, status_code=status.HTTP_200_OK):
         httponly=True,
         secure=False,
         samesite='Lax',
-    )    
+    ) 
+    
+    response.set_cookie(
+        'access_token',
+        access_token,
+        max_age=int(settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds()),
+        secure=False,
+        samesite='Lax',
+    )   
+    
     return response
 
 def create_success_response(message, data=None, status_code=status.HTTP_200_OK):

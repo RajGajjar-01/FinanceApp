@@ -35,7 +35,7 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const code = searchParams.get('code');
   const error = searchParams.get('error');
-  console.log("rendeer")
+  console.log('rendeer');
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -45,19 +45,35 @@ const Login = () => {
     },
   });
 
-   useEffect(() => {
-    if (code) {
-      setGoogleLoading(true);
-      handleGoogleCallback(code,"from:login");
-    }
-    if (error) {
-      console.error('OAuth error:', error);
-    }
-  }, [code, error]);
+  useEffect(() => {
+    const processGoogleCallback = async () => {
+      if (error) {
+        console.error('OAuth error:', error);
+        setGoogleLoading(false);
+        return;
+      }
 
+      if (code) {
+        setGoogleLoading(true);
+        try {
+          await handleGoogleCallback(code, 'from:login');
+        } catch (error) {
+          console.error('Google callback error:', error);
+          form.setError('root', {
+            message: 'Oops! Something went wrong!!',
+          });
+        } finally {
+          setGoogleLoading(false);
+        }
+      }
+    };
+
+    processGoogleCallback();
+  }, [code, error]);
 
   const onSubmit = async (data) => {
     const response = await login(data);
+    console.log(document.cookie);
     console.log(response);
     if (response.data?.errors?.non_field_errors)
       form.setError('root', {
@@ -76,9 +92,7 @@ const Login = () => {
         >
           <Card className="bg-card/95 backdrop-blur-sm border-2 border-border/70 dark:border-border/50 shadow-2xl rounded-md md:w-full">
             <CardHeader className="space-y-2 py-4 px-6 sm:px-8 lg:px-8">
-              <CardTitle className="text-3xl font-bold text-center">
-                Welcome Back
-              </CardTitle>
+              <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
               <CardDescription className="text-center text-base text-muted-foreground">
                 Sign in to your account to continue
               </CardDescription>
@@ -90,7 +104,7 @@ const Login = () => {
                 variant="outline"
                 size="lg"
                 className="w-full h-12 text-base font-medium border-border/50 hover:bg-muted/50 transition-all duration-200"
-                onClick={() => googleLogin("from:login")}
+                onClick={() => googleLogin('from:login')}
                 disabled={form.formState.isSubmitting || googleLoading}
               >
                 {googleLoading ? (
