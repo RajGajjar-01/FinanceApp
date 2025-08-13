@@ -5,6 +5,9 @@ import Login from '../pages/login';
 import Dashboard from '../pages/dashboard';
 import { Route, Routes } from 'react-router';
 import ProtectedRoute from './ProtectedRoute';
+// import EmailVerification from '@/pages/register-redirect';
+import OTPVerification from '@/pages/register-redirect';
+import DjangoCookieAPI from '@/pages/cookie';
 
 function Routing() {
   return (
@@ -12,6 +15,8 @@ function Routing() {
       <Route path="/" element={<Landing />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/verify-email" element={< OTPVerification/>} />
+      <Route path="/cookie" element={<DjangoCookieAPI />} />
       <Route
         path="/dashboard"
         element={

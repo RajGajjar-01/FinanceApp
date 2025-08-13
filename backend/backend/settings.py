@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
+
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,9 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'rest_framework',
+    'user',
     'corsheaders',
-    'user'
 ]
 
 MIDDLEWARE = [
@@ -118,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -160,7 +162,6 @@ CELERY_BROKER_CONNECTION_MAX_RETRIES = 100
 # Redis-specific optimizations
 CELERY_REDIS_MAX_CONNECTIONS = 20
 
-
 # Email setup
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -168,13 +169,13 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'atlantic.march11@gmail.com'
 EMAIL_HOST_PASSWORD = 'wqum nrfq myjy gder'
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'MyDjangoApp <noreply@hello.com>'
-
+DEFAULT_FROM_EMAIL = 'FinancialApp <noreply@hello.com>'
 
 # Google setup
 GOOGLE_OAUTH2_CLIENT_ID = '1034638916922-m87ikgv2679tj17bnb7skda96l3s98g1.apps.googleusercontent.com'
 GOOGLE_OAUTH2_CLIENT_SECRET = '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'
-GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google/callback/'
+GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:5173/login'
+GOOGLE_OAUTH2_REDIRECT_URI_REGISTER = 'http://localhost:5173/register'
 
 AUTH_USER_MODEL = 'user.UserCustom'
 
@@ -182,5 +183,25 @@ AUTH_USER_MODEL = 'user.UserCustom'
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # Fallback
 ]
+
+# JWT Settings for security
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=10),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  
+    "http://127.0.0.1:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
+

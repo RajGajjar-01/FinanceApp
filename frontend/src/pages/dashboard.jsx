@@ -1,19 +1,31 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/auth-context';
-import { User, Mail, Calendar, Activity } from 'lucide-react';
+import { User, Mail, Calendar, Activity, LogOut } from 'lucide-react';
+import { useNavigate, Link } from 'react-router';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const {user, logout} = useAuth();
 
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || 'User'}!</h1>
-            <p className="text-muted-foreground">
-              Here's what's happening with your account today.
-            </p>
+          <div className="mb-8 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || 'User'}!</h1>
+              <p className="text-muted-foreground">
+                Here's what's happening with your account today.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={logout}
+              className="flex items-center space-x-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

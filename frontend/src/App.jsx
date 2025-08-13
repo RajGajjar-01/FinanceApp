@@ -1,25 +1,18 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import Landing from './pages/landing';
 import { ThemeProvider } from '@/components/theme-provider';
-import Login from './pages/login';
-import Register from './pages/register';
-import Dashboard from './pages/dashboard';
 import { AuthProvider } from './contexts/auth-context';
-import { ModeToggle } from './components/mode-toggler';
 import Routing from './components/Routing';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 function App() {
-  // const [count, setCount] = useState(0)
-
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center font-mona-sans">
+    <div className="min-h-screen bg-background flex items-center justify-center font-space-grotesk">
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <AuthProvider>
-          {/* <Login /> */}
-          {/* <Landing /> */}
-          <Routing />
-        </AuthProvider>
+        <GoogleOAuthProvider clientId='1034638916922-m87ikgv2679tj17bnb7skda96l3s98g1.apps.googleusercontent.com'>
+          <AuthProvider>
+            <Routing />
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </ThemeProvider>
     </div>
   );
