@@ -161,7 +161,7 @@ class Transaction(TimeStampedModel):
                     raise ValidationError("Insufficient funds in savings account")
                 account.balance -= self.amount
             
-            account.save(update_fields=['balance', 'updated_at'])
+            account.save(update_fields=['balance', 'updated_at', 'is_default'])
 
 class Budget(TimeStampedModel):
     amount = models.DecimalField(

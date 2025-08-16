@@ -274,3 +274,404 @@ class AccountViewSet(viewsets.ModelViewSet):
                 _("Failed to set default account."),
                 errors=[_("An error occurred. Please try again.")]
             )
+
+
+
+
+from decimal import Decimal
+from django.db import transaction
+from django.utils.translation import gettext_lazy as _
+from django.db.models import Q, Sum, Count
+from rest_framework import permissions, viewsets, filters
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
+# from django_filters.rest_framework import DjangoFilterBackend
+from backend.utils import create_success_response, create_error_response
+from .models import Transaction, TransactionType, TransactionStatus
+from .serializers import (
+    TransactionSerializer, TransactionListSerializer,
+    TransactionCreateSerializer, BulkTransactionCreateSerializer,
+    UpdateTransactionStatusSerializer,
+)
+
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    filterset_fields = ['type', 'status', 'category', 'is_recurring', 'account']
+    ordering_fields = ['date', 'amount', 'created_at', 'category']
+    ordering = ['-date', '-created_at']
+    search_fields = ['description', 'category']
+
+    def get_queryset(self):
+        queryset = Transaction.objects.filter(user=self.request.user).order_by('-date', '-created_at')
+        serializer_class = self.get_serializer_class()
+        return serializer_class.setup_eager_loading(queryset) if hasattr(serializer_class, 'setup_eager_loading') else queryset
+
+    def get_serializer_class(self):
+        action_mapping = {
+            'list': TransactionListSerializer,
+            'create': TransactionCreateSerializer,
+            'bulk': BulkTransactionCreateSerializer,
+            'update_status': UpdateTransactionStatusSerializer,
+        }
+        return action_mapping.get(self.action, TransactionSerializer)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+            date_from = request.query_params.get('date_from')
+            date_to = request.query_params.get('date_to')
+            if date_from:
+                queryset = queryset.filter(date__date__gte=date_from)
+            if date_to:
+                queryset = queryset.filter(date__date__lte=date_to)
+            if not queryset.exists():
+                return create_success_response(_("No transactions."), data={'results': [], 'count': 0, 'next': None, 'previous': None})
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return create_success_response(_("Retrieved."), data=self.get_paginated_response(serializer.data).data)
+            serializer = self.get_serializer(queryset, many=True)
+            return create_success_response(_("Retrieved."), data={'results': serializer.data, 'count': len(serializer.data)})
+        except Exception as error:
+            return create_error_response(_("List failed."), errors=[str(error)])
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            return create_success_response(_("Retrieved."), data=self.get_serializer(instance).data)
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            return create_error_response(_("Retrieve failed."), errors=[str(error)])
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            if not serializer.is_valid():
+                return create_error_response(_("Invalid."), errors=serializer.errors)
+            instance = serializer.save()
+            return create_success_response(_("Created."), data=TransactionSerializer(instance, context={'request': request}).data)
+        except Exception as error:
+            error_message = getattr(error, 'detail', str(error))
+            return create_error_response(_("Create failed."), errors=[error_message])
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            if instance.status == TransactionStatus.COMPLETED and any(field in request.data for field in ['amount','type','account']):
+                return create_error_response(_("Cannot modify completed."), errors=[_("Restricted fields.")])
+            serializer = self.get_serializer(instance, data=request.data, partial=kwargs.pop('partial', False))
+            if not serializer.is_valid():
+                return create_error_response(_("Invalid."), errors=serializer.errors)
+            updated_instance = serializer.save()
+            return create_success_response(_("Updated."), data=TransactionSerializer(updated_instance, context={'request': request}).data)
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            error_message = getattr(error, 'detail', str(error))
+            return create_error_response(_("Update failed."), errors=[error_message])
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            if instance.status == TransactionStatus.COMPLETED:
+                return create_error_response(_("Cannot delete completed."), errors=[_("Restricted.")])
+            transaction_id = str(instance.id)
+            description = instance.description or f"{instance.type} - {instance.amount}"
+            instance.delete()
+            return create_success_response(_("Deleted."), data={'transaction_description': description, 'deleted_transaction_id': transaction_id})
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            return create_error_response(_("Delete failed."), errors=[str(error)])
+
+    @action(detail=False, methods=['post'], url_path='bulk')
+    def bulk(self, request):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            if not serializer.is_valid():
+                return create_error_response(_("Invalid CSV."), errors=serializer.errors)
+            result = serializer.save()
+            success_count = result.get('success_count', 0)
+            total_rows = result.get('total_rows', 0)
+            errors = result.get('errors', [])
+            message = _("All imported.") if not errors else _("Imported with errors.")
+            return create_success_response(message, data={'success_count': success_count, 'total_rows': total_rows, 'error_count': len(errors), 'errors': errors})
+        except Exception as error:
+            return create_error_response(_("Bulk failed."), errors=[str(error)])
+
+    @action(detail=True, methods=['patch'], url_path='update-status')
+    def update_status(self, request, id=None):
+        try:
+            transaction_obj = self.get_object()
+            serializer = self.get_serializer(data=request.data, context={'transaction': transaction_obj})
+            if not serializer.is_valid():
+                return create_error_response(_("Invalid status."), errors=serializer.errors)
+            updated_transaction = serializer.save()
+            return create_success_response(_("Status updated."), data=TransactionSerializer(updated_transaction, context={'request': request}).data)
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            return create_error_response(_("Update status failed."), errors=[str(error)])
+
+    @action(detail=False, methods=['get'], url_path='summary')
+    def summary(self, request):
+        try:
+            queryset = Transaction.objects.filter(user=request.user)
+            date_from = request.query_params.get('date_from')
+            date_to = request.query_params.get('date_to')
+            if date_from:
+                queryset = queryset.filter(date__date__gte=date_from)
+            if date_to:
+                queryset = queryset.filter(date__date__lte=date_to)
+            summary_stats = queryset.aggregate(
+                total_income=Sum('amount', filter=Q(type=TransactionType.INCOME, status=TransactionStatus.COMPLETED)),
+                total_expense=Sum('amount', filter=Q(type=TransactionType.EXPENSE, status=TransactionStatus.COMPLETED)),
+                completed_count=Count('id', filter=Q(status=TransactionStatus.COMPLETED)),
+                pending_count=Count('id', filter=Q(status=TransactionStatus.PENDING)),
+                failed_count=Count('id', filter=Q(status=TransactionStatus.FAILED)),
+            )
+            total_income = summary_stats.get('total_income') or Decimal('0.00')
+            total_expense = summary_stats.get('total_expense') or Decimal('0.00')
+            try:
+                category_breakdown = list(queryset.filter(status=TransactionStatus.COMPLETED)
+                           .values('category','type')
+                           .annotate(total=Sum('amount'))
+                           .order_by('-total'))
+            except Exception:
+                category_breakdown = []
+            summary_data = {
+                'total_income': total_income,
+                'total_expense': total_expense,
+                'net_amount': total_income - total_expense,
+                'transaction_count': summary_stats.get('completed_count',0),
+                'pending_count': summary_stats.get('pending_count',0),
+                'failed_count': summary_stats.get('failed_count',0),
+                'category_breakdown': category_breakdown,
+                'period': {'from': date_from, 'to': date_to}
+            }
+            return create_success_response(_("Summary retrieved."), data=summary_data)
+        except Exception as error:
+            return create_error_response(_("Summary failed."), errors=[str(error)])
+
+from decimal import Decimal
+from django.db import transaction
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from rest_framework import permissions, viewsets, filters
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, ValidationError
+from backend.utils import create_success_response, create_error_response
+from .models import Budget, Transaction, TransactionType, TransactionStatus
+from .serializers import BudgetSerializer, BudgetListSerializer, BudgetUtilizationSerializer
+import calendar
+
+
+class BudgetViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['amount', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        queryset = Budget.objects.filter(user=self.request.user)
+        serializer_class = self.get_serializer_class()
+        return serializer_class.setup_eager_loading(queryset) if hasattr(serializer_class, 'setup_eager_loading') else queryset
+
+    def get_serializer_class(self):
+        action_mapping = {
+            'list': BudgetListSerializer,
+            'utilization': BudgetUtilizationSerializer,
+        }
+        return action_mapping.get(self.action, BudgetSerializer)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+            
+            if not queryset.exists():
+                return create_success_response(
+                    _("No budget found."),
+                    data={'results': [], 'count': 0, 'next': None, 'previous': None}
+                )
+            
+            serializer = self.get_serializer(queryset.first())
+            return create_success_response(_("Retrieved."), data={'results': [serializer.data], 'count': 1})
+            
+        except Exception as error:
+            return create_error_response(_("List failed."), errors=[str(error)])
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            return create_success_response(_("Retrieved."), data=self.get_serializer(instance).data)
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            return create_error_response(_("Retrieve failed."), errors=[str(error)])
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        try:
+            if Budget.objects.filter(user=request.user).exists():
+                return create_error_response(_("Budget exists."), errors=[_("User can only have one budget.")])
+            
+            serializer = self.get_serializer(data=request.data)
+            if not serializer.is_valid():
+                return create_error_response(_("Invalid."), errors=serializer.errors)
+            
+            instance = serializer.save()
+            return create_success_response(_("Created."), data=BudgetSerializer(instance, context={'request': request}).data)
+            
+        except ValidationError as e:
+            return create_error_response(_("Create failed."), errors=getattr(e, 'detail', str(e)))
+        except Exception as error:
+            return create_error_response(_("Create failed."), errors=[str(error)])
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=kwargs.pop('partial', False))
+            if not serializer.is_valid():
+                return create_error_response(_("Invalid."), errors=serializer.errors)
+            
+            updated_instance = serializer.save()
+            return create_success_response(_("Updated."), data=BudgetSerializer(updated_instance, context={'request': request}).data)
+            
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except ValidationError as e:
+            return create_error_response(_("Update failed."), errors=getattr(e, 'detail', str(e)))
+        except Exception as error:
+            return create_error_response(_("Update failed."), errors=[str(error)])
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            budget_id = str(instance.id)
+            budget_amount = instance.amount
+            instance.delete()
+            return create_success_response(_("Deleted."), data={'budget_amount': budget_amount, 'deleted_budget_id': budget_id})
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            return create_error_response(_("Delete failed."), errors=[str(error)])
+
+    @action(detail=True, methods=['get'], url_path='utilization')
+    def utilization(self, request, id=None):
+        try:
+            budget = self.get_object()
+            serializer = self.get_serializer(budget)
+            return create_success_response(_("Utilization retrieved."), data=serializer.data)
+        except NotFound:
+            return create_error_response(_("Not found."), errors=[_("Does not exist")])
+        except Exception as error:
+            return create_error_response(_("Utilization failed."), errors=[str(error)])
+
+    @action(detail=False, methods=['get'], url_path='current')
+    def current(self, request):
+        try:
+            budget = Budget.objects.get(user=request.user)
+            serializer = BudgetSerializer(budget, context={'request': request})
+            return create_success_response(_("Current retrieved."), data=serializer.data)
+        except Budget.DoesNotExist:
+            return create_error_response(_("No budget."), errors=[_("Create budget first.")])
+        except Exception as error:
+            return create_error_response(_("Current failed."), errors=[str(error)])
+
+    @action(detail=False, methods=['get'], url_path='summary')
+    def summary(self, request):
+        
+        try:
+            budget = Budget.objects.select_related('user').get(user=request.user)
+            now = timezone.now()
+            start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+            transactions_qs = Transaction.objects.filter(
+                user=request.user,
+                type=TransactionType.EXPENSE,
+                status=TransactionStatus.COMPLETED,
+                date__gte=start_of_month,
+                date__lte=now
+            )
+
+            current_expenses = transactions_qs.aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0.00')
+
+            utilization_percentage = (
+                float(current_expenses) / float(budget.amount) * 100
+                if budget.amount > 0 else 0.0
+            )
+
+            transaction_count = transactions_qs.count()
+            average_transaction = (
+                current_expenses / transaction_count
+                if transaction_count > 0 else Decimal('0.00')
+            )
+
+           
+            days_in_month = calendar.monthrange(now.year, now.month)[1]
+            days_elapsed = now.day
+            days_remaining = days_in_month - days_elapsed + 1
+
+            average_daily_spending = (
+                current_expenses / days_elapsed if days_elapsed > 0 else Decimal('0.00')
+            )
+            projected_spending = average_daily_spending * days_in_month
+
+            category_breakdown = list(
+                transactions_qs
+                .values('category')
+                .annotate(total=Sum('amount'))
+                .order_by('-total')[:10]
+            )
+
+            recommendations = []
+            if utilization_percentage >= 100:
+                recommendations.append({'type': 'critical', 'message': _("Budget exceeded!")})
+            elif utilization_percentage >= 80:
+                recommendations.append({'type': 'warning', 'message': _("Approaching budget limit.")})
+            elif utilization_percentage >= 60:
+                recommendations.append({'type': 'caution', 'message': _("Monitor high-spending categories.")})
+            else:
+                recommendations.append({'type': 'success', 'message': _("Great job staying within budget!")})
+
+            summary_data = {
+                'budget_info': {
+                    'id': str(budget.id),
+                    'amount': budget.amount,
+                    'created_at': budget.created_at,
+                    'last_alert_sent': budget.last_alert_sent
+                },
+                'utilization': {
+                    'current_month_expenses': current_expenses,
+                    'utilization_percentage': round(utilization_percentage, 2),
+                    'category_breakdown': category_breakdown,
+                    'average_daily_spending': average_daily_spending,
+                    'projected_monthly_spending': projected_spending,
+                    'days_remaining_in_month': days_remaining,
+                },
+                'transaction_stats': {
+                    'monthly_transaction_count': transaction_count,
+                    'average_transaction_amount': average_transaction,
+                },
+                'recommendations': recommendations
+            }
+
+            return create_success_response(_("Summary retrieved."), data=summary_data)
+
+        except Budget.DoesNotExist:
+            return create_error_response(_("No budget."), errors=[_("Create budget first.")])
+        except Exception as e:
+            return create_error_response(_("Summary failed."), errors=[str(e)])
+

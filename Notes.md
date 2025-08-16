@@ -46,3 +46,7 @@ terminal> celery -A backend worker --loglevel=info
 - **Stop services**
 `docker-compose down`
 
+
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
