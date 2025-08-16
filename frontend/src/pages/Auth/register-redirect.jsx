@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '../contexts/auth-context';
+import { useAuth } from '../../contexts/auth-context';
 import { CheckCircle, RefreshCw, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 

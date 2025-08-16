@@ -123,7 +123,7 @@ def user_registration_view(request):
         if not otp_code:
             raise ValueError("OTP generation failed")   
          
-        send_verification_email.delay(otp_code, pending_user.email)
+        # send_verification_email.delay(otp_code, pending_user.email)
     except ValueError as err:
         pending_user.delete()
         return create_error_response(message=str(err), error_codes=[ErrorCodes.OTP_GENERATION_FAILURE])
@@ -202,7 +202,7 @@ def resend_verification_email_view(request):
             pending_user.save()
         
         otp_code = pending_user.generate_otp()
-        send_verification_email.delay(otp_code, pending_user.email)
+        # send_verification_email.delay(otp_code, pending_user.email)
 
         return create_success_response("Verification email sent successfully",data={"email": pending_user.email})
             

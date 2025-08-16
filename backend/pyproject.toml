@@ -16,5 +16,6 @@ dependencies = [
     "python-decouple>=3.8",
     "redis>=6.2.0",
     "requests>=2.32.4",
+    "rest-framework-simplejwt>=0.0.2",
     "simplejwt>=2.0.1",
 ]

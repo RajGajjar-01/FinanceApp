@@ -86,14 +86,14 @@ const Landing = () => {
         animate="visible"
       >
         <div className="text-center max-w-5xl mx-auto">
-          <motion.div className="flex flex-col sm:flex-row items-center justify-center mb-8 gap-4 sm:gap-6" variants={itemVariants}>
+          <motion.div
+            className="flex flex-col sm:flex-row items-center justify-center mb-8 gap-4 sm:gap-6"
+            variants={itemVariants}
+          >
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-center sm:text-left">
               Welcome to Finance App
             </h1>
-            <motion.div
-              className="flex-shrink-0"
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
-            >
+            <motion.div className="flex-shrink-0" transition={{ duration: 0.6, ease: 'easeInOut' }}>
               <ModeToggle />
             </motion.div>
           </motion.div>
@@ -113,9 +113,9 @@ const Landing = () => {
             variants={itemVariants}
           >
             <div className="relative group">
-              <Button 
-                size="default" 
-                asChild 
+              <Button
+                size="default"
+                asChild
                 className="h-11 px-6 text-base font-semibold relative overflow-hidden bg-gradient-to-b from-primary to-primary/90 border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Link to="/register" className="flex items-center relative">
@@ -189,7 +189,10 @@ const Landing = () => {
           </motion.div>
 
           {/* Bottom section with additional visual elements */}
-          <motion.div className="mt-16 sm:mt-20 lg:mt-24 pt-8 sm:pt-12 border-t border-border/40" variants={itemVariants}>
+          <motion.div
+            className="mt-16 sm:mt-20 lg:mt-24 pt-8 sm:pt-12 border-t border-border/40"
+            variants={itemVariants}
+          >
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground px-4 sm:px-0">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
