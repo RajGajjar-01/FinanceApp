@@ -30,7 +30,7 @@ def create_auth_response(user, message, status_code=status.HTTP_200_OK):
    
     response.set_cookie(
         'refresh_token',
-        refresh,
+        str(refresh),
         max_age=604800, 
         httponly=True,
         secure=False,
@@ -39,7 +39,7 @@ def create_auth_response(user, message, status_code=status.HTTP_200_OK):
     
     response.set_cookie(
         'access_token',
-        access_token,
+        str(access_token),
         max_age=int(settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds()),
         secure=False,
         samesite='Lax',

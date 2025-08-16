@@ -49,7 +49,7 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=255)
    
     def validate(self, data):
-        login = data.get('email')
+        login = data.get('login')
         password = data.get('password')
         
         try:

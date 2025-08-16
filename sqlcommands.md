@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS auth_group CASCADE;
+DROP TABLE IF EXISTS auth_group_permissions CASCADE;
+DROP TABLE IF EXISTS auth_permission CASCADE;
+DROP TABLE IF EXISTS budgets CASCADE;
+DROP TABLE IF EXISTS custom_user CASCADE;
+DROP TABLE IF EXISTS custom_user_groups CASCADE;
+DROP TABLE IF EXISTS custom_user_user_permissions CASCADE;
+DROP TABLE IF EXISTS django_admin_log CASCADE;
+DROP TABLE IF EXISTS django_content_type CASCADE;
+DROP TABLE IF EXISTS django_migrations CASCADE;
+DROP TABLE IF EXISTS django_session CASCADE;
+DROP TABLE IF EXISTS main_accounts CASCADE;
+DROP TABLE IF EXISTS main_transactions CASCADE;
+DROP TABLE IF EXISTS pending_user CASCADE;
+DROP TABLE IF EXISTS token_blacklist_blacklistedtoken CASCADE;
+DROP TABLE IF EXISTS token_blacklist_outstandingtoken CASCADE;

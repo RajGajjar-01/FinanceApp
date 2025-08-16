@@ -17,8 +17,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from . import models, serializers, throttles
 from .error_codes import ErrorCodes
-from .tasks import send_verification_email
-from .utils import create_auth_response, create_success_response, create_error_response
+from . import tasks
+from backend.utils import create_auth_response, create_success_response, create_error_response
 from rest_framework_simplejwt.exceptions import TokenError
 
 @api_view(['POST'])
@@ -112,18 +112,23 @@ def google_auth_callback(request):
 @api_view(['POST'])
 @throttle_classes([throttles.RegistrationThrottle])
 def user_registration_view(request):    
-    serializer = serializers.UserRegistrationSerializer(data=request.data)
+    serializer = serializers.UserRegistrationSerializer(data=request.data,many=False)
     
     if not serializer.is_valid():
         return create_error_response(message="Input field errors", errors=serializer.errors)
         
     pending_user = serializer.save()
+    print(type(pending_user))
+    
+    if not pending_user:
+        return create_error_response(message="User creation failed")
+    
     try:
         otp_code = pending_user.generate_otp()
         if not otp_code:
             raise ValueError("OTP generation failed")   
          
-        send_verification_email.delay(otp_code, pending_user.email)
+        tasks.send_verification_email.delay(otp_code, pending_user.email)
     except ValueError as err:
         pending_user.delete()
         return create_error_response(message=str(err), error_codes=[ErrorCodes.OTP_GENERATION_FAILURE])
@@ -137,7 +142,7 @@ def user_registration_view(request):
         
 @api_view(['POST'])
 def user_login_view(request):
-    serializer = serializers.UserLoginSerializer(data=request.data)
+    serializer = serializers.UserLoginSerializer(data=request.data, many=False)
     
     if serializer.is_valid():
         user = serializer.validated_data['user']
@@ -197,8 +202,7 @@ def resend_verification_email_view(request):
         pending_user = models.PendingUser.objects.get(email=email, is_verified=False)
         
         if not pending_user.is_valid():
-            pending_user.verification_token = secrets.token_urlsafe(32)
-            pending_user.expires_at = timezone.now() + timedelta(minutes=30)
+            pending_user.expires_at = timezone.now() + timedelta(minutes=10)
             pending_user.save()
         
         otp_code = pending_user.generate_otp()
@@ -285,7 +289,6 @@ def user_logout_view(request):
         response = create_success_response("Successfully logged out") 
         response.delete_cookie(
             'refresh_token',
-            samesite='None' ,
         )
         return response
         
