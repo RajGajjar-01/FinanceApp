@@ -12,12 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 from decouple import config
+
+FINNHUB_API_KEY = config("FINNHUB_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -49,6 +54,8 @@ INSTALLED_APPS = [
     'expense',
     'user',
     'corsheaders',
+    "channels",
+    "stock",
 ]
 
 MIDDLEWARE = [
@@ -80,7 +87,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = "backend.asgi.application"
 
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -162,6 +180,17 @@ CELERY_BROKER_CONNECTION_MAX_RETRIES = 100
 # Redis-specific optimizations
 CELERY_REDIS_MAX_CONNECTIONS = 20
 
+
+
+
+CELERY_BEAT_SCHEDULE = {
+    "fetch-stock-data-every-10s": {
+        "task": "stock.tasks.fetch_stock_data",
+        "schedule": 10.0,  # every 10 sec
+        "args": ("BINANCE:BTCUSDT",)  # change symbol here
+    },
+}
+
 # Email setup
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -204,4 +233,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+
+
 

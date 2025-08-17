@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router';
 import ProtectedRoute from './ProtectedRoute';
 import OTPVerification from '@/pages/register-redirect';
 import DjangoCookieAPI from '@/pages/cookie';
+import StockTicker from './StockTicker';
 
 function Routing() {
   return (
@@ -24,6 +25,7 @@ function Routing() {
           </ProtectedRoute>
         }
       />
+      <Route path='/abc' element={<StockTicker />} />
     </Routes>
   );
 }
