@@ -1,11 +1,10 @@
 import React from 'react';
 import Landing from '../pages/landing';
-import Register from '../pages/register';
-import Login from '../pages/login';
-import Dashboard from '../pages/dashboard';
+import Register from '@/pages/register';
+import Login from '@/pages/login';
+import Dashboard from '@/pages/dashboard';
 import { Route, Routes } from 'react-router';
 import ProtectedRoute from './ProtectedRoute';
-// import EmailVerification from '@/pages/register-redirect';
 import OTPVerification from '@/pages/register-redirect';
 import DjangoCookieAPI from '@/pages/cookie';
 

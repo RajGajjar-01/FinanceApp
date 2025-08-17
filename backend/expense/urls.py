@@ -10,6 +10,6 @@ router.register(r'transactions', TransactionViewSet, basename='transactions')
 router.register(r'budget', BudgetViewSet, basename='budget')
 
 urlpatterns = [
-    path('expense/', include(router.urls)),
+    path('', include(router.urls)),
 ]
 

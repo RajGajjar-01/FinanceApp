@@ -24,7 +24,7 @@ from user import views as user_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include("user.urls")),
-    path('', include("expense.urls")),
+    path('expense/', include("expense.urls")),
     path('auth/google/callback/', user_views.google_auth_callback, name='google_auth_callback'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', user_views.token_refresh_view, name='token_refresh'),

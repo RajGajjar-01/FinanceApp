@@ -4,7 +4,6 @@ PUT    /api/budget/                 # Update budget
 DELETE /api/budget/                 # Delete budget
 GET    /api/budget/utilization/     # Get budget utilization stats
 
-
 GET    /api/transactions/           # List transactions with filters
 POST   /api/transactions/           # Create new transaction
 GET    /api/transactions/{id}/      # Get specific transaction
