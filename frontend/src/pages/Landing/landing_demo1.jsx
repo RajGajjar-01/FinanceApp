@@ -1,9 +1,7 @@
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import React, { useState } from 'react';
-
 import heroImage from '@/assets/dashboardImage.jpg';
-
 import { motion } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,10 +12,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-
 import TiltedCard from '@/components/react-bits/TiltedCard';
 import CountUp from '../../components/react-bits/CountUp';
-
 import {
   Sparkles,
   Rocket,
@@ -36,7 +32,7 @@ import {
   Star,
 } from 'lucide-react';
 
-// Professional animation variants
+// Professional animation variants (keeping existing ones)
 const staggerContainer = {
   animate: {
     transition: {
@@ -44,7 +40,6 @@ const staggerContainer = {
     },
   },
 };
-
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   animate: {
@@ -53,7 +48,6 @@ const fadeInUp = {
     transition: { duration: 1, ease: 'easeOut' },
   },
 };
-
 const popupAnimation = {
   initial: {
     opacity: 0,
@@ -73,8 +67,6 @@ const popupAnimation = {
     },
   },
 };
-
-// New button animations
 const buttonHover = {
   scale: 1.05,
   transition: {
@@ -83,12 +75,9 @@ const buttonHover = {
     damping: 10,
   },
 };
-
 const buttonTap = {
   scale: 0.95,
 };
-
-// New animation for TiltedCard
 const cardSlideUp = {
   initial: {
     opacity: 0,
@@ -110,7 +99,6 @@ const cardSlideUp = {
     },
   },
 };
-
 const floatingAnimation = {
   animate: {
     y: [0, -10, 0],
@@ -121,8 +109,6 @@ const floatingAnimation = {
     },
   },
 };
-
-// New hover effects for stats cards
 const statsHover = {
   scale: 1.03,
   y: -5,
@@ -132,27 +118,21 @@ const statsHover = {
     damping: 20,
   },
 };
-
-// Updated slower animations for problem & solution
 const slideInLeft = {
   initial: { opacity: 0, x: -50 },
   animate: { opacity: 1, x: 0 },
   transition: { duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] },
 };
-
 const slideInRight = {
   initial: { opacity: 0, x: 50 },
   animate: { opacity: 1, x: 0 },
   transition: { duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] },
 };
-
 const scaleIn = {
   initial: { opacity: 0, scale: 0.95 },
   animate: { opacity: 1, scale: 1 },
   transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
 };
-
-// Card hover animation
 const cardHover = {
   scale: 1.02,
   y: -5,
@@ -164,8 +144,6 @@ const cardHover = {
     damping: 20,
   },
 };
-
-// Feature text hover animation
 const featureHover = {
   color: 'rgba(255, 255, 255, 1)',
   textShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
@@ -177,14 +155,14 @@ const featureHover = {
 
 const LandingDemo = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
-
+  
   const stats = [
     { number: 5000, label: 'Active Users', icon: Users },
     { number: 25000, label: 'Transactions Tracked', icon: BarChart3 },
     { number: 98, label: 'User Satisfaction', icon: Award, suffix: '%' },
     { number: 24, label: 'AI Response Time', icon: Zap, suffix: 'ms' },
   ];
-
+  
   const features = [
     {
       category: 'Smart Expense Tracking',
@@ -217,8 +195,7 @@ const LandingDemo = () => {
       ],
     },
   ];
-
-  // Updated problems array with 5 points
+  
   const problems = [
     'Manual expense tracking wastes hours',
     'Investment performance is confusing',
@@ -226,7 +203,7 @@ const LandingDemo = () => {
     'Fragmented view of financial health',
     'Multiple apps create data silos',
   ];
-
+  
   const steps = [
     {
       number: 1,
@@ -253,7 +230,7 @@ const LandingDemo = () => {
       icon: TrendingUp,
     },
   ];
-
+  
   const testimonials = [
     {
       quote:
@@ -280,7 +257,7 @@ const LandingDemo = () => {
       rating: 5,
     },
   ];
-
+  
   const pricingPlans = [
     {
       name: 'Free',
@@ -329,9 +306,9 @@ const LandingDemo = () => {
     <>
       <Header />
       <div className="min-h-screen overflow-hidden">
-        {/* Hero Section */}
+        {/* Hero Section - Fixed: Added better large screen responsiveness */}
         <section className="relative min-h-screen flex items-center justify-center py-20">
-          <div className="container mx-auto px-4 relative z-10">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 relative z-10 max-w-7xl">
             <motion.div
               className="text-center max-w-6xl mx-auto"
               initial="initial"
@@ -339,23 +316,24 @@ const LandingDemo = () => {
               variants={staggerContainer}
             >
               <motion.div variants={fadeInUp}>
-                <Badge className="mb-6 text-base font-semibold px-4 py-2">
-                  <Sparkles className="w-5 h-5 mr-2" />
+                <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
+                  <Sparkles className="w-4 md:w-5 h-4 md:h-5 mr-2" />
                   The Future of Personal Finance
                 </Badge>
               </motion.div>
-
+              
+              {/* Fixed: Proper h1 heading */}
               <motion.h1
-                className="text-4xl md:text-6xl font-bold mb-6 leading-tight max-w-3xl mx-auto text-center"
+                className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight max-w-4xl mx-auto text-center"
                 variants={fadeInUp}
               >
                 <span className="block text-blue-600 dark:text-blue-400">FinanceIQ</span>
                 <span className="block text-gray-800 dark:text-gray-200">Your Complete</span>
                 <span className="block text-gray-500 dark:text-gray-400">Money Manager</span>
               </motion.h1>
-
+              
               <motion.p
-                className="text-lg md:text-xl text-muted-foreground mb-6 leading-relaxed"
+                className="text-base md:text-lg xl:text-xl text-muted-foreground mb-6 leading-relaxed max-w-3xl mx-auto"
                 variants={popupAnimation}
               >
                 <span className="text-primary font-semibold">Track Expenses</span>
@@ -364,61 +342,55 @@ const LandingDemo = () => {
                 <span className="mx-2">•</span>
                 <span className="text-primary font-semibold">Ask AI Anything</span>
               </motion.p>
-
+              
               <motion.p
-                className="text-base text-muted-foreground mb-8 max-w-2xl mx-auto"
+                className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl mx-auto"
                 variants={fadeInUp}
               >
                 The only finance app that combines expense tracking, investment management, and
                 intelligent insights in one secure platform.
               </motion.p>
-
+              
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
                 variants={fadeInUp}
               >
-                {/* Get Started Button with Animations */}
                 <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                  <Button size="lg" className="px-8 py-3 relative overflow-hidden group">
-                    <Rocket className="mr-2 h-5 w-5" />
+                  <Button size="lg" className="px-6 md:px-8 py-3 relative overflow-hidden group text-sm md:text-base">
+                    <Rocket className="mr-2 h-4 md:h-5 w-4 md:w-5" />
                     Get Started Free
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                    {/* Shine effect on hover */}
+                    <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
                     <motion.div
                       className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"
                       style={{ transform: 'skewX(-15deg)' }}
                     />
                   </Button>
                 </motion.div>
-
-                {/* Watch Demo Button with Animations */}
+                
                 <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                  <Button size="lg" variant="outline" className="px-8 py-3 group">
-                    <Target className="mr-2 h-5 w-5 group-hover:text-primary transition-colors" />
+                  <Button size="lg" variant="outline" className="px-6 md:px-8 py-3 group text-sm md:text-base">
+                    <Target className="mr-2 h-4 md:h-5 w-4 md:w-5 group-hover:text-primary transition-colors" />
                     Watch Demo
                   </Button>
                 </motion.div>
               </motion.div>
-
-              {/* Improved TiltedCard with Motion Animation and Better Alignment */}
+              
+              {/* Fixed: Better responsive sizing for TiltedCard */}
               <motion.div
                 className="flex justify-center items-center mt-8"
                 variants={cardSlideUp}
                 animate={floatingAnimation}
               >
-                <div className="relative max-w-2xl mx-auto">
-                  {/* Glow effect behind the card */}
+                <div className="relative max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20 blur-3xl scale-110 opacity-60" />
-
-                  {/* TiltedCard Container with proper sizing and centering */}
                   <div className="relative z-10 flex justify-center">
                     <TiltedCard
                       imageSrc={heroImage}
                       altText="FinanceIQ Dashboard Preview"
-                      containerHeight="400px"
-                      containerWidth="600px"
-                      imageHeight="400px"
-                      imageWidth="600px"
+                      containerHeight="300px sm:350px md:400px"
+                      containerWidth="400px sm:500px md:600px"
+                      imageHeight="300px sm:350px md:400px"
+                      imageWidth="400px sm:500px md:600px"
                       rotateAmplitude={8}
                       scaleOnHover={1.05}
                       showMobileWarning={false}
@@ -433,11 +405,11 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Stats Section - Fixed: Better responsive grid */}
         <section className="py-16 border-t">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
             <motion.div
-              className="grid grid-cols-2 md:grid-cols-4 gap-8"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:gap-8"
               initial="initial"
               whileInView="animate"
               variants={staggerContainer}
@@ -446,17 +418,16 @@ const LandingDemo = () => {
               {stats.map((stat, index) => (
                 <motion.div
                   key={index}
-                  className="text-center cursor-pointer p-4 rounded-lg hover:bg-primary/5 hover:shadow-lg border border-transparent hover:border-primary/10"
+                  className="text-center cursor-pointer p-3 md:p-4 xl:p-6 rounded-lg hover:bg-primary/5 hover:shadow-lg border border-transparent hover:border-primary/10"
                   variants={fadeInUp}
                   whileHover={statsHover}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <motion.div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4 transition-colors hover:bg-primary/15">
-                    <stat.icon className="h-8 w-8 text-primary transition-transform" />
+                  <motion.div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4 transition-colors hover:bg-primary/15">
+                    <stat.icon className="h-6 w-6 md:h-8 md:w-8 text-primary transition-transform" />
                   </motion.div>
-
                   <motion.div
-                    className="text-3xl md:text-4xl font-bold mb-2"
+                    className="text-2xl md:text-3xl xl:text-4xl font-bold mb-2"
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: 'spring', stiffness: 400 }}
                   >
@@ -470,8 +441,7 @@ const LandingDemo = () => {
                     />
                     {stat.suffix && <span className="text-primary">{stat.suffix}</span>}
                   </motion.div>
-
-                  <p className="text-muted-foreground font-medium transition-colors hover:text-foreground">
+                  <p className="text-sm md:text-base text-muted-foreground font-medium transition-colors hover:text-foreground">
                     {stat.label}
                   </p>
                 </motion.div>
@@ -480,9 +450,9 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* Features Section with Morphing Expansion Animation */}
+        {/* Features Section - Fixed: Improved heading hierarchy */}
         <section className="py-20">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
             <motion.div
               className="text-center mb-16"
               initial="initial"
@@ -490,20 +460,21 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-base font-semibold px-4 py-2">
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
                 <Award className="w-4 h-4 mr-2" />
                 Why Choose FinanceIQ?
               </Badge>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
+              {/* Fixed: Proper h2 heading */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Revolutionary Features
               </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
                 Experience the next generation of financial management with AI-powered insights.
               </p>
             </motion.div>
-
+            
             <motion.div
-              className="grid md:grid-cols-3 gap-8"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8"
               initial="initial"
               whileInView="animate"
               variants={staggerContainer}
@@ -512,7 +483,7 @@ const LandingDemo = () => {
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
-                  className="relative h-80"
+                  className="relative h-72 md:h-80"
                   variants={fadeInUp}
                   onHoverStart={() => setHoveredCard(index)}
                   onHoverEnd={() => setHoveredCard(null)}
@@ -525,9 +496,8 @@ const LandingDemo = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <Card className="w-full h-full border-2 shadow-lg relative overflow-hidden bg-gradient-to-br from-background to-primary/5">
-                      {/* Initial State - Icon and Category */}
                       <motion.div
-                        className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center"
+                        className="absolute inset-0 flex flex-col items-center justify-center p-6 xl:p-8 text-center"
                         animate={{
                           opacity: hoveredCard === index ? 0 : 1,
                           scale: hoveredCard === index ? 0.8 : 1,
@@ -535,20 +505,20 @@ const LandingDemo = () => {
                         transition={{ duration: 0.4, ease: 'easeOut' }}
                       >
                         <motion.div
-                          className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+                          className="w-16 h-16 xl:w-20 xl:h-20 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg"
                           whileHover={{ rotate: 360 }}
                           transition={{ duration: 0.6 }}
                         >
-                          <feature.icon className="h-10 w-10 text-primary-foreground" />
+                          <feature.icon className="h-8 w-8 xl:h-10 xl:w-10 text-primary-foreground" />
                         </motion.div>
-                        <h3 className="text-2xl font-bold text-primary leading-tight">
+                        {/* Fixed: Proper h3 heading */}
+                        <h3 className="text-lg md:text-xl xl:text-2xl font-bold text-primary leading-tight">
                           {feature.category}
                         </h3>
                       </motion.div>
-
-                      {/* Hover State - Feature Details */}
+                      
                       <motion.div
-                        className="absolute inset-0 p-6 flex flex-col justify-center"
+                        className="absolute inset-0 p-4 md:p-6 flex flex-col justify-center"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{
                           opacity: hoveredCard === index ? 1 : 0,
@@ -558,12 +528,12 @@ const LandingDemo = () => {
                       >
                         <div className="flex items-center gap-3 mb-6">
                           <motion.div
-                            className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center"
+                            className="w-10 h-10 md:w-12 md:h-12 bg-primary rounded-xl flex items-center justify-center"
                             transition={{ duration: 0.6 }}
                           >
-                            <feature.icon className="h-6 w-6 text-primary-foreground" />
+                            <feature.icon className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
                           </motion.div>
-                          <h4 className="text-lg font-bold text-primary">{feature.category}</h4>
+                          <h4 className="text-base md:text-lg font-bold text-primary">{feature.category}</h4>
                         </div>
                         <div className="space-y-3">
                           {feature.items.map((item, itemIndex) => (
@@ -584,9 +554,9 @@ const LandingDemo = () => {
                                 whileHover={{ scale: 1.2, rotate: 90 }}
                                 transition={{ type: 'spring', stiffness: 400 }}
                               >
-                                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                                <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
                               </motion.div>
-                              <span className="text-sm font-medium">{item}</span>
+                              <span className="text-xs md:text-sm font-medium">{item}</span>
                             </motion.div>
                           ))}
                         </div>
@@ -599,10 +569,10 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* Problem & Solution Section - Improved */}
+        {/* Problem & Solution Section - Fixed: Better responsive layout */}
         <section className="py-20 border-t">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-start relative">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-8 xl:gap-12 items-start relative">
               <motion.div
                 className="flex flex-col justify-start h-full"
                 initial="initial"
@@ -611,16 +581,15 @@ const LandingDemo = () => {
                 viewport={{ once: true }}
               >
                 <div className="flex items-center justify-start mb-6">
-                  <Badge className="text-base font-semibold px-4 py-2 bg-destructive/10 text-destructive border-destructive/20">
+                  <Badge className="text-sm md:text-base font-semibold px-3 md:px-4 py-2 bg-destructive/10 text-destructive border-destructive/20">
                     🔍 The Problem
                   </Badge>
                 </div>
-
-                <h3 className="text-2xl md:text-3xl font-bold mb-6 leading-tight">
+                {/* Fixed: Proper h3 heading under h2 Features */}
+                <h3 className="text-xl md:text-2xl xl:text-3xl font-bold mb-6 leading-tight">
                   Managing personal finances shouldn't require{' '}
                   <span className="text-destructive">five different apps</span>
                 </h3>
-
                 <div className="space-y-4 flex-grow">
                   {problems.map((problem, index) => (
                     <motion.div
@@ -632,13 +601,12 @@ const LandingDemo = () => {
                       viewport={{ once: true }}
                     >
                       <div className="w-2 h-2 bg-destructive rounded-full flex-shrink-0 mt-2" />
-                      <p className="text-muted-foreground leading-relaxed">{problem}</p>
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{problem}</p>
                     </motion.div>
                   ))}
                 </div>
               </motion.div>
-
-              {/* Solutions Section */}
+              
               <motion.div
                 className="flex flex-col justify-start h-full"
                 initial="initial"
@@ -647,28 +615,26 @@ const LandingDemo = () => {
                 viewport={{ once: true }}
               >
                 <div className="flex items-center justify-start mb-6">
-                  <Badge className="text-base font-semibold px-4 py-2 bg-primary/10 text-primary border-primary/20">
+                  <Badge className="text-sm md:text-base font-semibold px-3 md:px-4 py-2 bg-primary/10 text-primary border-primary/20">
                     ✅ The Solution
                   </Badge>
                 </div>
-
-                <h3 className="text-2xl md:text-3xl font-bold mb-6 leading-tight">
+                {/* Fixed: Proper h3 heading */}
+                <h3 className="text-xl md:text-2xl xl:text-3xl font-bold mb-6 leading-tight">
                   One intelligent platform that{' '}
                   <span className="text-primary">connects everything</span>
                 </h3>
-
                 <div className="flex-grow">
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <p className="text-sm md:text-base text-muted-foreground mb-6 leading-relaxed">
                     Experience the future of financial management with our AI-powered platform that
                     unifies your spending, savings, and investments with intelligent insights.
                   </p>
-
                   <motion.div
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
-                    <Button className="px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Button className="px-4 md:px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-sm md:text-base">
                       See How It Works
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -679,9 +645,9 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* How It Works Section - Alternative Design */}
+        {/* How It Works Section - Fixed: Better responsive spacing */}
         <section className="py-20">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
             <motion.div
               className="text-center mb-16"
               initial="initial"
@@ -689,49 +655,44 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-base font-semibold px-4 py-2">
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
                 <Zap className="w-4 h-4 mr-2" />
                 How It Works
               </Badge>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
+              {/* Fixed: Proper h2 heading */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Your Journey to Financial Freedom
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
                 Follow these simple steps to transform your financial management experience
               </p>
             </motion.div>
-
-            {/* Vertical Timeline Design */}
-            <div className="max-w-4xl mx-auto">
+            
+            <div className="max-w-5xl mx-auto">
               <div className="relative">
-                {/* Vertical Line */}
-                <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-muted/30"></div>
-
-                {/* Animated Progress Line */}
+                <div className="absolute left-6 md:left-8 lg:left-1/2 top-0 bottom-0 w-1 bg-muted/30"></div>
                 <motion.div
-                  className="absolute left-8 md:left-1/2 top-0 w-1 bg-gradient-to-b from-blue-500 to-purple-600"
+                  className="absolute left-6 md:left-8 lg:left-1/2 top-0 w-1 bg-gradient-to-b from-blue-500 to-purple-600"
                   initial={{ height: 0 }}
                   whileInView={{ height: '100%' }}
                   transition={{ duration: 2.5, ease: 'easeInOut', delay: 0.5 }}
                   viewport={{ once: true }}
                 />
-
-                {/* Steps */}
-                <div className="space-y-16">
+                
+                <div className="space-y-12 md:space-y-16">
                   {steps.map((step, index) => (
                     <motion.div
                       key={index}
                       className={`relative flex items-center ${
-                        index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                        index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
                       }`}
                       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.2 }}
                       viewport={{ once: true }}
                     >
-                      {/* Step Circle */}
                       <motion.div
-                        className="absolute left-6 md:left-1/2 md:-translate-x-1/2 w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg z-10"
+                        className="absolute left-4 md:left-6 lg:left-1/2 lg:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-full flex items-center justify-center text-white font-bold text-xs md:text-sm shadow-lg z-10"
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         transition={{ delay: 0.8 + index * 0.2, type: 'spring', stiffness: 400 }}
@@ -739,11 +700,10 @@ const LandingDemo = () => {
                       >
                         {step.number}
                       </motion.div>
-
-                      {/* Content Card */}
+                      
                       <div
-                        className={`ml-20 md:ml-0 md:w-5/12 ${
-                          index % 2 === 0 ? 'md:mr-auto md:pr-16' : 'md:ml-auto md:pl-16'
+                        className={`ml-16 md:ml-20 lg:ml-0 lg:w-5/12 ${
+                          index % 2 === 0 ? 'lg:mr-auto lg:pr-8 xl:pr-16' : 'lg:ml-auto lg:pl-8 xl:pl-16'
                         }`}
                       >
                         <motion.div
@@ -753,23 +713,19 @@ const LandingDemo = () => {
                         >
                           <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 border hover:border-primary/30 bg-gradient-to-br from-background to-primary/5 group cursor-pointer">
                             <CardHeader className="pb-3">
-                              {/* Icon */}
-                              <motion.div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-all duration-300">
-                                <step.icon className="h-6 w-6 text-primary group-hover:text-primary/80 transition-colors duration-300" />
+                              <motion.div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-all duration-300">
+                                <step.icon className="h-5 w-5 md:h-6 md:w-6 text-primary group-hover:text-primary/80 transition-colors duration-300" />
                               </motion.div>
-
-                              <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                              {/* Fixed: Proper h4 heading under h2 */}
+                              <CardTitle className="text-lg md:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
                                 {step.title}
                               </CardTitle>
                             </CardHeader>
-
                             <CardContent>
-                              <CardDescription className="text-muted-foreground leading-relaxed text-base group-hover:text-foreground/80 transition-colors duration-300">
+                              <CardDescription className="text-sm md:text-base text-muted-foreground leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
                                 {step.description}
                               </CardDescription>
                             </CardContent>
-
-                            {/* Hover Effects */}
                             <motion.div
                               className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg pointer-events-none"
                               whileHover={{ scale: 1.02 }}
@@ -785,9 +741,9 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* Social Proof */}
+        {/* Social Proof Section - Fixed: Better responsive testimonials */}
         <section className="py-20 border-t">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
             <motion.div
               className="text-center mb-16"
               initial="initial"
@@ -795,16 +751,17 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-base font-semibold px-4 py-2">
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
                 🌟 What Our Users Say
               </Badge>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
+              {/* Fixed: Proper h2 heading */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Loved by Thousands
               </h2>
             </motion.div>
-
+            
             <motion.div
-              className="grid md:grid-cols-3 gap-8"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8"
               initial="initial"
               whileInView="animate"
               variants={staggerContainer}
@@ -812,22 +769,22 @@ const LandingDemo = () => {
             >
               {testimonials.map((testimonial, index) => (
                 <motion.div key={index} variants={fadeInUp}>
-                  <Card className="h-full border shadow-sm">
-                    <CardContent className="pt-6">
+                  <Card className="h-full border shadow-sm hover:shadow-lg transition-all duration-300">
+                    <CardContent className="pt-4 md:pt-6">
                       <div className="flex mb-4">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <Star key={i} className="h-3 w-3 md:h-4 md:w-4 fill-yellow-400 text-yellow-400" />
                         ))}
                       </div>
-                      <blockquote className="text-muted-foreground mb-4 italic">
+                      <blockquote className="text-sm md:text-base text-muted-foreground mb-4 italic leading-relaxed">
                         "{testimonial.quote}"
                       </blockquote>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-lg">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center text-sm md:text-lg">
                           {testimonial.avatar}
                         </div>
                         <div>
-                          <p className="font-bold text-sm">{testimonial.name}</p>
+                          <p className="font-bold text-xs md:text-sm">{testimonial.name}</p>
                           <p className="text-muted-foreground text-xs">{testimonial.title}</p>
                         </div>
                       </div>
@@ -839,9 +796,9 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* Pricing */}
+        {/* Pricing Section - Fixed: Better responsive pricing cards */}
         <section className="py-20">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
             <motion.div
               className="text-center mb-16"
               initial="initial"
@@ -849,14 +806,15 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-base font-semibold px-4 py-2">💵 Simple Pricing</Badge>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">💵 Simple Pricing</Badge>
+              {/* Fixed: Proper h2 heading */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
                 Start Free, <span className="text-primary">Upgrade When Ready</span>
               </h2>
             </motion.div>
-
+            
             <motion.div
-              className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 max-w-6xl mx-auto"
               initial="initial"
               whileInView="animate"
               variants={staggerContainer}
@@ -871,31 +829,31 @@ const LandingDemo = () => {
                   >
                     {plan.popular && (
                       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <Badge className="text-xs">Most Popular</Badge>
+                        <Badge className="text-xs md:text-sm">Most Popular</Badge>
                       </div>
                     )}
                     <CardHeader className="text-center">
-                      <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
-                      <CardDescription className="text-sm">{plan.description}</CardDescription>
+                      <CardTitle className="text-lg md:text-xl font-bold">{plan.name}</CardTitle>
+                      <CardDescription className="text-xs md:text-sm">{plan.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="text-center">
-                      <div className="text-3xl font-bold mb-6">
+                      <div className="text-2xl md:text-3xl font-bold mb-6">
                         <span className="text-primary">₹{plan.price}</span>
-                        <span className="text-sm text-muted-foreground">/month</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">/month</span>
                       </div>
                       <ul className="space-y-2 mb-8 text-left">
                         {plan.features.map((feature, featureIndex) => (
                           <motion.li
                             key={featureIndex}
-                            className="flex items-center gap-2 text-sm transition-all duration-300 cursor-pointer"
+                            className="flex items-center gap-2 text-xs md:text-sm transition-all duration-300 cursor-pointer"
                           >
-                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                            <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-primary flex-shrink-0" />
                             <span>{feature}</span>
                           </motion.li>
                         ))}
                       </ul>
                       <Button
-                        className="w-full transition-all duration-300 hover:shadow-lg"
+                        className="w-full transition-all duration-300 hover:shadow-lg text-sm md:text-base"
                         variant={plan.popular ? 'default' : 'outline'}
                       >
                         {plan.price === 0 ? 'Get Started Free' : 'Choose Plan'}
@@ -908,9 +866,9 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* FAQ Section - Fixed: Better responsive accordion */}
         <section className="py-20 border-t">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl">
             <motion.div
               className="text-center mb-16"
               initial="initial"
@@ -918,12 +876,13 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-base font-semibold px-4 py-2">
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
                 ❓ Frequently Asked Questions
               </Badge>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">Got Questions?</h2>
+              {/* Fixed: Proper h2 heading */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">Got Questions?</h2>
             </motion.div>
-
+            
             <motion.div
               className="max-w-4xl mx-auto"
               initial="initial"
@@ -962,12 +921,12 @@ const LandingDemo = () => {
                   <AccordionItem
                     key={index}
                     value={`item-${index}`}
-                    className="border rounded-lg px-6 py-1"
+                    className="border rounded-lg px-4 md:px-6 py-1"
                   >
-                    <AccordionTrigger className="text-left font-semibold hover:text-primary py-4">
+                    <AccordionTrigger className="text-left font-semibold hover:text-primary py-4 text-sm md:text-base">
                       {faq.question}
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pb-4">
+                    <AccordionContent className="text-muted-foreground pb-4 text-sm md:text-base">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
@@ -977,38 +936,37 @@ const LandingDemo = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* CTA Section - Fixed: Better responsive CTA */}
         <section className="py-20 bg-primary relative overflow-hidden">
-          <div className="container mx-auto px-4 text-center relative z-10">
+          <div className="container mx-auto px-4 xl:px-6 2xl:px-8 max-w-7xl text-center relative z-10">
             <motion.div
-              className="max-w-3xl mx-auto text-primary-foreground"
+              className="max-w-4xl mx-auto text-primary-foreground"
               initial="initial"
               whileInView="animate"
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              {/* Fixed: Proper h2 heading */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-6">
                 Ready to Take Control of Your <span className="text-secondary">Finances?</span>
               </h2>
-
-              <p className="text-lg md:text-xl mb-8 opacity-90 leading-relaxed">
+              <p className="text-base md:text-lg xl:text-xl mb-8 opacity-90 leading-relaxed max-w-3xl mx-auto">
                 Join over 50,000 users who are already managing their money smarter with FinanceIQ.
                 Start your journey to financial freedom today.
               </p>
-
-              <Button size="lg" variant="secondary" className="px-8 py-4 text-lg font-semibold">
-                <Rocket className="mr-2 h-5 w-5" />
+              <Button size="lg" variant="secondary" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold">
+                <Rocket className="mr-2 h-4 md:h-5 w-4 md:w-5" />
                 Start Your Free Journey Today
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
               </Button>
-
-              <p className="mt-6 text-sm opacity-75">
+              <p className="mt-6 text-xs md:text-sm opacity-75">
                 No credit card required • Setup in under 2 minutes • Cancel anytime
               </p>
             </motion.div>
           </div>
         </section>
       </div>
+      <Footer />
     </>
   );
 };
