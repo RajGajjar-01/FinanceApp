@@ -1,12 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '../contexts/auth-context';
+import { useAuth } from '../../contexts/auth-context';
 import { User, Mail, Calendar, Activity, LogOut } from 'lucide-react';
 import { useNavigate, Link } from 'react-router';
 
 const Dashboard = () => {
   const {user, logout} = useAuth();
-  console.log("dsfa");
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
