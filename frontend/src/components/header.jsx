@@ -71,7 +71,7 @@ const Header = () => {
 
               {/* Project Name */}
               <span className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200">
-                ProjectName
+                FinanceIQ
               </span>
             </Link>
           </motion.div>

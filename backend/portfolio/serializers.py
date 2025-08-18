@@ -12,7 +12,6 @@ from .models import (
 
 User = get_user_model()
 
-
 class StockSerializer(serializers.ModelSerializer):
     day_change = serializers.DecimalField(max_digits=15, decimal_places=4, read_only=True)
     day_change_percentage = serializers.DecimalField(max_digits=8, decimal_places=4, read_only=True)
@@ -48,7 +47,6 @@ class StockSerializer(serializers.ModelSerializer):
         data['day_change_percentage'] = instance.day_change_percentage
         return data
 
-
 class StockListSerializer(serializers.ModelSerializer):
     day_change = serializers.DecimalField(max_digits=15, decimal_places=4, read_only=True)
     day_change_percentage = serializers.DecimalField(max_digits=8, decimal_places=4, read_only=True)
@@ -67,7 +65,6 @@ class StockListSerializer(serializers.ModelSerializer):
         data['day_change'] = instance.day_change
         data['day_change_percentage'] = instance.day_change_percentage
         return data
-
 
 class PortfolioSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -126,7 +123,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
         })
         return data
 
-
 class PortfolioListSerializer(serializers.ModelSerializer):
     stock_symbol = serializers.CharField(source='stock.symbol', read_only=True)
     stock_name = serializers.CharField(source='stock.name', read_only=True)
@@ -161,7 +157,6 @@ class PortfolioListSerializer(serializers.ModelSerializer):
         })
         return data
 
-
 class PortfolioCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
@@ -191,7 +186,6 @@ class PortfolioCreateSerializer(serializers.ModelSerializer):
         if value > timezone.now().date():
             raise ValidationError(_("Purchase date cannot be in the future."))
         return value
-
 
 class WishlistSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -246,7 +240,6 @@ class WishlistSerializer(serializers.ModelSerializer):
         })
         return data
 
-
 class WishlistListSerializer(serializers.ModelSerializer):
     stock_symbol = serializers.CharField(source='stock.symbol', read_only=True)
     stock_name = serializers.CharField(source='stock.name', read_only=True)
@@ -279,7 +272,6 @@ class WishlistListSerializer(serializers.ModelSerializer):
         })
         return data
 
-
 class WishlistCreateSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
@@ -300,23 +292,20 @@ class WishlistCreateSerializer(serializers.ModelSerializer):
             raise ValidationError(_("Target buy price must be greater than zero."))
         return value
 
-
 class ToggleWishlistAlertsSerializer(serializers.Serializer):
     email_alerts_enabled = serializers.BooleanField()
 
-    @transaction.atomic
     def save(self):
         wishlist_item = self.context.get("wishlist_item")
         if not wishlist_item:
             raise ValidationError(_("Wishlist item not in context."))
         
-        new_status = self.validated_data.get("email_alerts_enabled")
+        new_status = self.validated_data["email_alerts_enabled"]
         if wishlist_item.email_alerts_enabled != new_status:
             wishlist_item.email_alerts_enabled = new_status
             wishlist_item.save(update_fields=["email_alerts_enabled", "updated_at"])
         
         return wishlist_item
-
 
 class PriceAlertSerializer(serializers.ModelSerializer):
     wishlist_stock_symbol = serializers.CharField(source='wishlist_item.stock.symbol', read_only=True)
@@ -336,7 +325,6 @@ class PriceAlertSerializer(serializers.ModelSerializer):
     def setup_eager_loading(queryset):
         return queryset.select_related('wishlist_item__stock', 'wishlist_item__user')
 
-
 class PriceAlertListSerializer(serializers.ModelSerializer):
     wishlist_stock_symbol = serializers.CharField(source='wishlist_item.stock.symbol', read_only=True)
     wishlist_stock_name = serializers.CharField(source='wishlist_item.stock.name', read_only=True)
@@ -354,23 +342,20 @@ class PriceAlertListSerializer(serializers.ModelSerializer):
     def setup_eager_loading(queryset):
         return queryset.select_related('wishlist_item__stock')
 
-
 class UpdatePriceAlertStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=AlertStatus.choices)
 
-    @transaction.atomic
     def save(self):
         alert = self.context.get("alert")
         if not alert:
             raise ValidationError(_("Price alert not in context."))
         
-        new_status = self.validated_data.get("status")
+        new_status = self.validated_data["status"]
         if alert.status != new_status:
             alert.status = new_status
             alert.save(update_fields=["status", "updated_at"])
         
         return alert
-
 
 class PortfolioSummarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -383,7 +368,6 @@ class PortfolioSummarySerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
-
 class PortfolioSummaryDetailSerializer(serializers.Serializer):
     portfolio_summary = PortfolioSummarySerializer(read_only=True)
     top_performers = serializers.ListField(read_only=True)
@@ -393,9 +377,7 @@ class PortfolioSummaryDetailSerializer(serializers.Serializer):
     risk_metrics = serializers.DictField(read_only=True)
     recommendations = serializers.ListField(read_only=True)
 
-
 class RefreshPortfolioSummarySerializer(serializers.Serializer):
-    @transaction.atomic
     def save(self):
         user = self.context.get("user")
         if not user:

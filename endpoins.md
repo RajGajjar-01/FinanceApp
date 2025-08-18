@@ -19,5 +19,44 @@ DELETE /api/accounts/{id}/          # Delete account
 PATCH  /api/accounts/{id}/set-default/  # Set as default account
 
 
+3. Wishlist Model Endpoints
+Standard CRUD:
+
+GET /api/wishlist/ - List user's wishlist items
+
+POST /api/wishlist/ - Add stock to wishlist
+
+GET /api/wishlist/{id}/ - Get specific wishlist item
+
+PUT /api/wishlist/{id}/ - Update wishlist item
+
+PATCH /api/wishlist/{id}/ - Partial update wishlist item
+
+DELETE /api/wishlist/{id}/ - Remove from wishlist
+
+Additional Endpoints:
+
+GET /api/wishlist/alerts-ready/ - Items ready to trigger alerts
+
+POST /api/wishlist/{id}/toggle-alerts/ - Enable/disable alerts for item
+
+GET /api/wishlist/by-priority/ - Wishlist items sorted by priority
+
+4. PriceAlert Model Endpoints
+Limited CRUD (Mostly Read-Only):
+
+GET /api/price-alerts/ - List user's price alerts history
+
+GET /api/price-alerts/{id}/ - Get specific alert details
+
+PATCH /api/price-alerts/{id}/ - Update alert status (mark as read)
+
+Additional Endpoints:
+
+GET /api/price-alerts/recent/ - Recent alerts for user
+
+GET /api/price-alerts/unread/ - Unread alerts count
+
+
 replace api -> expense
 eg http://localhost:8000/api/budget ---> http://localhost:8000/expense/budget

@@ -15,8 +15,10 @@ import {
 import TiltedCard from '@/components/react-bits/TiltedCard';
 import CountUp from '../../components/react-bits/CountUp';
 
-import { stats, features, problems, steps, testimonials, pricingPlans } from './landing_data'; 
+import { stats, features, problems, steps, testimonials, pricingPlans } from './landing_data';
 import { Award, Sparkles, Rocket, ArrowRight, Target, CheckCircle, Star, Zap } from 'lucide-react';
+
+import Particles from '@/components/react-bits/Particles';
 
 const staggerContainer = {
   animate: {
@@ -147,23 +149,22 @@ const Landing = () => {
               variants={staggerContainer}
             >
               <motion.div variants={fadeInUp}>
-                <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4   border border-green-600 text-green-600 bg-transparent rounded-full">
+                <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 border-black text-black dark:border-green-400 dark:text-green-400 bg-transparent rounded-full">
                   The Future of Personal Finance
                 </Badge>
               </motion.div>
 
               {/* Fixed: Proper h1 heading */}
               <motion.h1
-                className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight max-w-4xl mx-auto text-center"
+                className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold mb-6 leading-tight max-w-4xl mx-auto text-center font-mona-sans"
                 variants={fadeInUp}
               >
-                <span className="block text-blue-500 dark:text-blue-400">FinanceIQ</span>
-                <span className="block dark:text-gray-200">Your Complete</span>
-                <span className="block dark:text-gray-200">Money Manager</span>
+                <span className="block text-green-500 dark:text-green-400">FinanceIQ</span>
+                <span className="block dark:text-gray-200">Your Complete Money Manager</span>
               </motion.h1>
 
               <motion.p
-                className="text-base md:text-lg xl:text-xl text-muted-foreground mb-6 leading-relaxed max-w-3xl mx-auto"
+                className="text-base md:text-lg xl:text-xl text-muted-foreground md:mb-6 leading-relaxed max-w-3xl mx-auto"
                 variants={popupAnimation}
               >
                 <span className="text-primary font-semibold">Track Expenses</span>
@@ -174,7 +175,7 @@ const Landing = () => {
               </motion.p>
 
               <motion.p
-                className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl mx-auto"
+                className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto"
                 variants={fadeInUp}
               >
                 The only finance app that combines expense tracking, investment management, and
@@ -190,13 +191,8 @@ const Landing = () => {
                     size="lg"
                     className="px-6 md:px-8 py-3 relative overflow-hidden group text-sm md:text-base"
                   >
-                    <Rocket className="mr-2 h-4 md:h-5 w-4 md:w-5" />
                     Get Started Free
                     <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
-                    <motion.div
-                      className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"
-                      style={{ transform: 'skewX(-15deg)' }}
-                    />
                   </Button>
                 </motion.div>
 
@@ -213,7 +209,7 @@ const Landing = () => {
               </motion.div>
 
               {/* Fixed: Better responsive sizing for TiltedCard */}
-               <motion.div
+              <motion.div
                 className="flex justify-center items-center mt-8"
                 variants={cardSlideUp}
                 animate={floatingAnimation}
