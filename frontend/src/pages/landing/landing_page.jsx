@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/accordion';
 import TiltedCard from '@/components/react-bits/TiltedCard';
 import CountUp from '../../components/react-bits/CountUp';
+import { useNavigate } from 'react-router-dom';
 
 import { stats, features, problems, steps, testimonials, pricingPlans } from './landing_data';
 import { Award, Sparkles, Rocket, ArrowRight, Target, CheckCircle, Star, Zap } from 'lucide-react';
@@ -132,6 +133,7 @@ const cardHover = {
 
 const Landing = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -188,22 +190,13 @@ const Landing = () => {
                   <Button
                     size="lg"
                     className="px-6 md:px-8 py-3 relative overflow-hidden group text-sm md:text-base"
-                  >
+                  onClick={() => navigate('/register')}>
                     Get Started Free
                     <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
                   </Button>
                 </motion.div>
 
-                <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="px-6 md:px-8 py-3 group text-sm md:text-base"
-                  >
-                    <Target className="mr-2 h-4 md:h-5 w-4 md:w-5 group-hover:text-primary transition-colors" />
-                    Watch Demo
-                  </Button>
-                </motion.div>
+                
               </motion.div>
 
               {/* Fixed: Better responsive sizing for TiltedCard */}
@@ -294,10 +287,10 @@ const Landing = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
-                <Award className="w-4 h-4 mr-2" />
-                Why Choose FinanceIQ?
-              </Badge>
+              
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 border-black text-black dark:border-green-400 dark:text-green-400 bg-transparent rounded-full">
+                  Why Choose FinanceIQ?
+                </Badge>
               {/* Fixed: Proper h2 heading */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Revolutionary Features
@@ -472,7 +465,7 @@ const Landing = () => {
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
-                    <Button className="px-4 md:px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-sm md:text-base">
+                    <Button className="px-4 md:px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-sm md:text-base" onClick={() => navigate('/register')}>
                       See How It Works
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -493,10 +486,11 @@ const Landing = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2 border border-green-600 text-green-600 bg-transparent rounded-full">
-                <Zap className="w-4 h-4 mr-2" />
-                How It Works
-              </Badge>
+              
+
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 border-black text-black dark:border-green-400 dark:text-green-400 bg-transparent rounded-full">
+                  How It Works
+                </Badge>
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Your Journey to Financial Freedom
               </h2>
@@ -512,7 +506,7 @@ const Landing = () => {
 
                 {/* Animated progress line */}
                 <motion.div
-                  className="absolute left-6 md:left-8 lg:left-1/2 lg:-translate-x-0.5 top-0 w-1 dark:bg-green-400/60"
+                  className="absolute left-6 md:left-8 lg:left-1/2 lg:-translate-x-0.5 top-0 w-1 bg-black/60 dark:bg-green-400/60"
                   initial={{ height: 0 }}
                   whileInView={{ height: '100%' }}
                   transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
@@ -533,7 +527,7 @@ const Landing = () => {
                     >
                       {/* Step number circle - changed to blue */}
                       <motion.div
-                        className="absolute left-4 md:left-6 lg:left-1/2 lg:-translate-x-1/2 w-8 h-8 md:w-10 md:h-10 dark:bg-green-400 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base shadow-lg z-10"
+                        className="absolute left-4 md:left-6 lg:left-1/2 lg:-translate-x-1/2 w-8 h-8 md:w-10 md:h-10 bg-black dark:bg-green-700 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base shadow-lg z-10"
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         transition={{
@@ -593,9 +587,10 @@ const Landing = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
-                🌟 What Our Users Say
-              </Badge>
+              
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 border-black text-black dark:border-green-400 dark:text-green-400 bg-transparent rounded-full">
+                   What Our Users Say
+                </Badge>
               {/* Fixed: Proper h2 heading */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Loved by Thousands
@@ -651,9 +646,10 @@ const Landing = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
-                💵 Simple Pricing
-              </Badge>
+              
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 border-black text-black dark:border-green-400 dark:text-green-400 bg-transparent rounded-full">
+                  Simple Pricing
+                </Badge>
               {/* Fixed: Proper h2 heading */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
                 Start Free, <span className="text-primary">Upgrade When Ready</span>
@@ -704,7 +700,7 @@ const Landing = () => {
                       <Button
                         className="w-full transition-all duration-300 hover:shadow-lg text-sm md:text-base"
                         variant={plan.popular ? 'default' : 'outline'}
-                      >
+                      onClick={() => navigate('/register')}>
                         {plan.price === 0 ? 'Get Started Free' : 'Choose Plan'}
                       </Button>
                     </CardContent>
@@ -725,9 +721,10 @@ const Landing = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
-                Frequently Asked Questions
-              </Badge>
+              
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 border-black text-black dark:border-green-400 dark:text-green-400 bg-transparent rounded-full">
+                 Frequently Asked Questions
+                </Badge>
               {/* Fixed: Proper h2 heading */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Got Questions?
@@ -809,7 +806,7 @@ const Landing = () => {
                 size="lg"
                 variant="secondary"
                 className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold"
-              >
+              onClick={() => navigate('/register')}>
                 <Rocket className="mr-2 h-4 md:h-5 w-4 md:w-5" />
                 Start Your Free Journey Today
                 <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
