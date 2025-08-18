@@ -8,6 +8,7 @@ import ProtectedRoute from './ProtectedRoute';
 import OTPVerification from '@/pages/register-redirect';
 import DjangoCookieAPI from '@/pages/cookie';
 import StockTicker from './StockTicker';
+import StockSearch from './ui/StockSearch';
 
 function Routing() {
   return (
@@ -26,6 +27,7 @@ function Routing() {
         }
       />
       <Route path='/abc' element={<StockTicker />} />
+      <Route path='/search' element={<StockSearch />} />
     </Routes>
   );
 }
