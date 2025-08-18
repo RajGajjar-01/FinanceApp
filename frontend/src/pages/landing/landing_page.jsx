@@ -14,25 +14,10 @@ import {
 } from '@/components/ui/accordion';
 import TiltedCard from '@/components/react-bits/TiltedCard';
 import CountUp from '../../components/react-bits/CountUp';
-import {
-  Sparkles,
-  Rocket,
-  ArrowRight,
-  Target,
-  Users,
-  BarChart3,
-  Award,
-  Zap,
-  Scan,
-  TrendingUp,
-  Brain,
-  CheckCircle,
-  Upload,
-  MessageSquare,
-  Star,
-} from 'lucide-react';
 
-// Professional animation variants (keeping existing ones)
+import { stats, features, problems, steps, testimonials, pricingPlans } from './landing_data'; 
+import { Award, Sparkles, Rocket, ArrowRight, Target, CheckCircle, Star, Zap } from 'lucide-react';
+
 const staggerContainer = {
   animate: {
     transition: {
@@ -144,163 +129,9 @@ const cardHover = {
     damping: 20,
   },
 };
-const featureHover = {
-  color: 'rgba(255, 255, 255, 1)',
-  textShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
-  transition: {
-    duration: 0.3,
-    ease: 'easeInOut',
-  },
-};
 
-const LandingDemo = () => {
+const Landing = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
-  
-  const stats = [
-    { number: 5000, label: 'Active Users', icon: Users },
-    { number: 25000, label: 'Transactions Tracked', icon: BarChart3 },
-    { number: 98, label: 'User Satisfaction', icon: Award, suffix: '%' },
-    { number: 24, label: 'AI Response Time', icon: Zap, suffix: 'ms' },
-  ];
-  
-  const features = [
-    {
-      category: 'Smart Expense Tracking',
-      icon: Scan,
-      items: [
-        'OCR receipt scanning',
-        'Smart categorization',
-        'Budget management',
-        'Trend analysis',
-      ],
-    },
-    {
-      category: 'Portfolio Management',
-      icon: TrendingUp,
-      items: [
-        'Real-time valuations',
-        'Performance analytics',
-        'Asset allocation',
-        'Risk assessment',
-      ],
-    },
-    {
-      category: 'AI Financial Assistant',
-      icon: Brain,
-      items: [
-        'Natural-language queries',
-        'Personalized insights',
-        'Spending optimization',
-        'Investment advice',
-      ],
-    },
-  ];
-  
-  const problems = [
-    'Manual expense tracking wastes hours',
-    'Investment performance is confusing',
-    'No personalized financial guidance',
-    'Fragmented view of financial health',
-    'Multiple apps create data silos',
-  ];
-  
-  const steps = [
-    {
-      number: 1,
-      title: 'Connect Your Finances',
-      description: 'Upload receipts, add expenses, import investment data',
-      icon: Upload,
-    },
-    {
-      number: 2,
-      title: 'Let AI Learn Your Patterns',
-      description: 'Our system analyzes your spending & investments',
-      icon: Brain,
-    },
-    {
-      number: 3,
-      title: 'Get Personalized Insights',
-      description: 'Ask questions, receive alerts, decide smarter',
-      icon: MessageSquare,
-    },
-    {
-      number: 4,
-      title: 'Watch Your Wealth Grow',
-      description: 'Track progress toward your goals with actionable recommendations',
-      icon: TrendingUp,
-    },
-  ];
-  
-  const testimonials = [
-    {
-      quote:
-        'Finally, an app that gets the complete financial picture. The AI assistant feels like having a personal financial advisor 24/7.',
-      name: 'Rahul S.',
-      title: 'Software Engineer',
-      avatar: '👨‍💻',
-      rating: 5,
-    },
-    {
-      quote:
-        'Scanning receipts and seeing my portfolio alongside expenses is a game-changer. Saved me hours every week!',
-      name: 'Priya M.',
-      title: 'Entrepreneur',
-      avatar: '👩‍💼',
-      rating: 5,
-    },
-    {
-      quote:
-        'AI insights helped me plug spending leaks. Saved me ₹15,000 last month! The ROI is incredible.',
-      name: 'Amit K.',
-      title: 'Marketing Manager',
-      avatar: '👨‍💼',
-      rating: 5,
-    },
-  ];
-  
-  const pricingPlans = [
-    {
-      name: 'Free',
-      price: 0,
-      description: 'Perfect for getting started',
-      features: [
-        'Basic expense tracking',
-        'Portfolio monitoring',
-        '5 AI queries/month',
-        'Core insights & alerts',
-        'Bank-grade security',
-      ],
-      popular: false,
-    },
-    {
-      name: 'Pro',
-      price: 299,
-      description: 'For serious money managers',
-      features: [
-        'Unlimited expense tracking',
-        'Advanced portfolio analytics',
-        '100 AI queries/month',
-        'Custom categories & tags',
-        'Priority support',
-        'Export capabilities',
-      ],
-      popular: true,
-    },
-    {
-      name: 'Premium',
-      price: 599,
-      description: 'Complete financial control',
-      features: [
-        'Everything in Pro',
-        'Unlimited AI queries',
-        'Advanced reporting',
-        'Multi-account sync',
-        'Custom alerts',
-        'Dedicated support',
-      ],
-      popular: false,
-    },
-  ];
 
   return (
     <>
@@ -316,22 +147,21 @@ const LandingDemo = () => {
               variants={staggerContainer}
             >
               <motion.div variants={fadeInUp}>
-                <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
-                  <Sparkles className="w-4 md:w-5 h-4 md:h-5 mr-2" />
+                <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4   border border-green-600 text-green-600 bg-transparent rounded-full">
                   The Future of Personal Finance
                 </Badge>
               </motion.div>
-              
+
               {/* Fixed: Proper h1 heading */}
               <motion.h1
                 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight max-w-4xl mx-auto text-center"
                 variants={fadeInUp}
               >
-                <span className="block text-blue-600 dark:text-blue-400">FinanceIQ</span>
-                <span className="block text-gray-800 dark:text-gray-200">Your Complete</span>
-                <span className="block text-gray-500 dark:text-gray-400">Money Manager</span>
+                <span className="block text-blue-500 dark:text-blue-400">FinanceIQ</span>
+                <span className="block dark:text-gray-200">Your Complete</span>
+                <span className="block dark:text-gray-200">Money Manager</span>
               </motion.h1>
-              
+
               <motion.p
                 className="text-base md:text-lg xl:text-xl text-muted-foreground mb-6 leading-relaxed max-w-3xl mx-auto"
                 variants={popupAnimation}
@@ -342,7 +172,7 @@ const LandingDemo = () => {
                 <span className="mx-2">•</span>
                 <span className="text-primary font-semibold">Ask AI Anything</span>
               </motion.p>
-              
+
               <motion.p
                 className="text-sm md:text-base text-muted-foreground mb-8 max-w-2xl mx-auto"
                 variants={fadeInUp}
@@ -350,13 +180,16 @@ const LandingDemo = () => {
                 The only finance app that combines expense tracking, investment management, and
                 intelligent insights in one secure platform.
               </motion.p>
-              
+
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
                 variants={fadeInUp}
               >
                 <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                  <Button size="lg" className="px-6 md:px-8 py-3 relative overflow-hidden group text-sm md:text-base">
+                  <Button
+                    size="lg"
+                    className="px-6 md:px-8 py-3 relative overflow-hidden group text-sm md:text-base"
+                  >
                     <Rocket className="mr-2 h-4 md:h-5 w-4 md:w-5" />
                     Get Started Free
                     <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
@@ -366,35 +199,42 @@ const LandingDemo = () => {
                     />
                   </Button>
                 </motion.div>
-                
+
                 <motion.div whileHover={buttonHover} whileTap={buttonTap}>
-                  <Button size="lg" variant="outline" className="px-6 md:px-8 py-3 group text-sm md:text-base">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="px-6 md:px-8 py-3 group text-sm md:text-base"
+                  >
                     <Target className="mr-2 h-4 md:h-5 w-4 md:w-5 group-hover:text-primary transition-colors" />
                     Watch Demo
                   </Button>
                 </motion.div>
               </motion.div>
-              
+
               {/* Fixed: Better responsive sizing for TiltedCard */}
-              <motion.div
+               <motion.div
                 className="flex justify-center items-center mt-8"
                 variants={cardSlideUp}
                 animate={floatingAnimation}
               >
-                <div className="relative max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto">
+                <div className="relative max-w-2xl mx-auto">
+                  {/* Glow effect behind the card */}
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20 blur-3xl scale-110 opacity-60" />
+
+                  {/* TiltedCard Container with proper sizing and centering */}
                   <div className="relative z-10 flex justify-center">
                     <TiltedCard
                       imageSrc={heroImage}
                       altText="FinanceIQ Dashboard Preview"
-                      containerHeight="300px sm:350px md:400px"
-                      containerWidth="400px sm:500px md:600px"
-                      imageHeight="300px sm:350px md:400px"
-                      imageWidth="400px sm:500px md:600px"
+                      containerHeight="25rem"
+                      containerWidth="37.5rem"
+                      imageHeight="25rem"
+                      imageWidth="37.5rem"
                       rotateAmplitude={8}
-                      scaleOnHover={1.05}
+                      scaleOnHover={1.04}
                       showMobileWarning={false}
-                      showTooltip={true}
+                      showTooltip={false}
                       displayOverlayContent={true}
                       className="shadow-2xl rounded-2xl overflow-hidden"
                     />
@@ -472,7 +312,7 @@ const LandingDemo = () => {
                 Experience the next generation of financial management with AI-powered insights.
               </p>
             </motion.div>
-            
+
             <motion.div
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8"
               initial="initial"
@@ -516,7 +356,7 @@ const LandingDemo = () => {
                           {feature.category}
                         </h3>
                       </motion.div>
-                      
+
                       <motion.div
                         className="absolute inset-0 p-4 md:p-6 flex flex-col justify-center"
                         initial={{ opacity: 0, y: 20 }}
@@ -533,7 +373,9 @@ const LandingDemo = () => {
                           >
                             <feature.icon className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
                           </motion.div>
-                          <h4 className="text-base md:text-lg font-bold text-primary">{feature.category}</h4>
+                          <h4 className="text-base md:text-lg font-bold text-primary">
+                            {feature.category}
+                          </h4>
                         </div>
                         <div className="space-y-3">
                           {feature.items.map((item, itemIndex) => (
@@ -601,12 +443,14 @@ const LandingDemo = () => {
                       viewport={{ once: true }}
                     >
                       <div className="w-2 h-2 bg-destructive rounded-full flex-shrink-0 mt-2" />
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{problem}</p>
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                        {problem}
+                      </p>
                     </motion.div>
                   ))}
                 </div>
               </motion.div>
-              
+
               <motion.div
                 className="flex flex-col justify-start h-full"
                 initial="initial"
@@ -655,11 +499,10 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2 border border-green-600 text-green-600 bg-transparent rounded-full">
                 <Zap className="w-4 h-4 mr-2" />
                 How It Works
               </Badge>
-              {/* Fixed: Proper h2 heading */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
                 Your Journey to Financial Freedom
               </h2>
@@ -667,69 +510,74 @@ const LandingDemo = () => {
                 Follow these simple steps to transform your financial management experience
               </p>
             </motion.div>
-            
+
             <div className="max-w-5xl mx-auto">
               <div className="relative">
-                <div className="absolute left-6 md:left-8 lg:left-1/2 top-0 bottom-0 w-1 bg-muted/30"></div>
+                {/* Background line */}
+                <div className="absolute left-6 md:left-8 lg:left-1/2 lg:-translate-x-0.5 top-0 bottom-0 w-1 bg-muted/30"></div>
+
+                {/* Animated progress line */}
                 <motion.div
-                  className="absolute left-6 md:left-8 lg:left-1/2 top-0 w-1 bg-gradient-to-b from-blue-500 to-purple-600"
+                  className="absolute left-6 md:left-8 lg:left-1/2 lg:-translate-x-0.5 top-0 w-1 dark:bg-green-400/60"
                   initial={{ height: 0 }}
                   whileInView={{ height: '100%' }}
-                  transition={{ duration: 2.5, ease: 'easeInOut', delay: 0.5 }}
+                  transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
                   viewport={{ once: true }}
                 />
-                
-                <div className="space-y-12 md:space-y-16">
+
+                <div className="space-y-8 md:space-y-10">
                   {steps.map((step, index) => (
                     <motion.div
                       key={index}
                       className={`relative flex items-center ${
                         index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
                       }`}
-                      initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.2 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
                       viewport={{ once: true }}
                     >
+                      {/* Step number circle - changed to blue */}
                       <motion.div
-                        className="absolute left-4 md:left-6 lg:left-1/2 lg:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-full flex items-center justify-center text-white font-bold text-xs md:text-sm shadow-lg z-10"
+                        className="absolute left-4 md:left-6 lg:left-1/2 lg:-translate-x-1/2 w-8 h-8 md:w-10 md:h-10 dark:bg-green-400 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base shadow-lg z-10"
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
-                        transition={{ delay: 0.8 + index * 0.2, type: 'spring', stiffness: 400 }}
+                        transition={{
+                          delay: 0.4 + index * 0.1,
+                          type: 'spring',
+                          stiffness: 300,
+                        }}
                         viewport={{ once: true }}
                       >
                         {step.number}
                       </motion.div>
-                      
+
+                      {/* Card content - moved closer to bullets */}
                       <div
-                        className={`ml-16 md:ml-20 lg:ml-0 lg:w-5/12 ${
-                          index % 2 === 0 ? 'lg:mr-auto lg:pr-8 xl:pr-16' : 'lg:ml-auto lg:pl-8 xl:pl-16'
+                        className={`ml-14 md:ml-18 lg:ml-0 lg:w-5/12 ${
+                          index % 2 === 0
+                            ? 'lg:mr-auto lg:pr-6 xl:pr-8'
+                            : 'lg:ml-auto lg:pl-6 xl:pl-8'
                         }`}
                       >
                         <motion.div
-                          whileInView={{ scale: [0.9, 1.02, 1] }}
-                          transition={{ delay: 1 + index * 0.2, duration: 0.4 }}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
                           viewport={{ once: true }}
                         >
-                          <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 border hover:border-primary/30 bg-gradient-to-br from-background to-primary/5 group cursor-pointer">
-                            <CardHeader className="pb-3">
-                              <motion.div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-all duration-300">
-                                <step.icon className="h-5 w-5 md:h-6 md:w-6 text-primary group-hover:text-primary/80 transition-colors duration-300" />
-                              </motion.div>
-                              {/* Fixed: Proper h4 heading under h2 */}
-                              <CardTitle className="text-lg md:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
-                                {step.title}
-                              </CardTitle>
+                          <Card className="shadow-md hover:shadow-xl transition-all duration-300 border hover:border-green-400/50 hover:text-green-400  cursor-pointer relative overflow-hidden">
+                            <CardHeader className="pb-4">
+                              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-50/10 rounded-xl flex items-center justify-center mb-4">
+                                <step.icon className="h-6 w-6" />
+                              </div>
+                              <CardTitle className="text-xl font-bold">{step.title}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                              <CardDescription className="text-sm md:text-base text-muted-foreground leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
+                              <CardDescription className="leading-relaxed">
                                 {step.description}
                               </CardDescription>
                             </CardContent>
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg pointer-events-none"
-                              whileHover={{ scale: 1.02 }}
-                            />
                           </Card>
                         </motion.div>
                       </div>
@@ -759,7 +607,7 @@ const LandingDemo = () => {
                 Loved by Thousands
               </h2>
             </motion.div>
-            
+
             <motion.div
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8"
               initial="initial"
@@ -773,7 +621,10 @@ const LandingDemo = () => {
                     <CardContent className="pt-4 md:pt-6">
                       <div className="flex mb-4">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-3 w-3 md:h-4 md:w-4 fill-yellow-400 text-yellow-400" />
+                          <Star
+                            key={i}
+                            className="h-3 w-3 md:h-4 md:w-4 fill-yellow-400 text-yellow-400"
+                          />
                         ))}
                       </div>
                       <blockquote className="text-sm md:text-base text-muted-foreground mb-4 italic leading-relaxed">
@@ -806,13 +657,15 @@ const LandingDemo = () => {
               variants={fadeInUp}
               viewport={{ once: true }}
             >
-              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">💵 Simple Pricing</Badge>
+              <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
+                💵 Simple Pricing
+              </Badge>
               {/* Fixed: Proper h2 heading */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
                 Start Free, <span className="text-primary">Upgrade When Ready</span>
               </h2>
             </motion.div>
-            
+
             <motion.div
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 max-w-6xl mx-auto"
               initial="initial"
@@ -834,7 +687,9 @@ const LandingDemo = () => {
                     )}
                     <CardHeader className="text-center">
                       <CardTitle className="text-lg md:text-xl font-bold">{plan.name}</CardTitle>
-                      <CardDescription className="text-xs md:text-sm">{plan.description}</CardDescription>
+                      <CardDescription className="text-xs md:text-sm">
+                        {plan.description}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="text-center">
                       <div className="text-2xl md:text-3xl font-bold mb-6">
@@ -877,12 +732,14 @@ const LandingDemo = () => {
               viewport={{ once: true }}
             >
               <Badge className="mb-6 text-sm md:text-base font-semibold px-3 md:px-4 py-2">
-                ❓ Frequently Asked Questions
+                Frequently Asked Questions
               </Badge>
               {/* Fixed: Proper h2 heading */}
-              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">Got Questions?</h2>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 text-primary">
+                Got Questions?
+              </h2>
             </motion.div>
-            
+
             <motion.div
               className="max-w-4xl mx-auto"
               initial="initial"
@@ -954,7 +811,11 @@ const LandingDemo = () => {
                 Join over 50,000 users who are already managing their money smarter with FinanceIQ.
                 Start your journey to financial freedom today.
               </p>
-              <Button size="lg" variant="secondary" className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold"
+              >
                 <Rocket className="mr-2 h-4 md:h-5 w-4 md:w-5" />
                 Start Your Free Journey Today
                 <ArrowRight className="ml-2 h-4 md:h-5 w-4 md:w-5" />
@@ -971,4 +832,4 @@ const LandingDemo = () => {
   );
 };
 
-export default LandingDemo;
+export default Landing;

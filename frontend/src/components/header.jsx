@@ -17,12 +17,12 @@ const Header = () => {
       variant: 'ghost',
     },
     {
-      label: 'Sign-In', // Changed from 'Login'
+      label: 'Sign-In', 
       href: '/login',
       variant: 'outline',
     },
     {
-      label: 'Get Started', // Changed from 'Register'
+      label: 'Get Started',
       href: '/register',
       variant: 'default',
     },
@@ -200,12 +200,6 @@ const Header = () => {
                 </div>
 
                 <Separator className="my-6" />
-                
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">
-                    ProjectName © 2025
-                  </p>
-                </div>
               </SheetContent>
             </Sheet>
           </div>

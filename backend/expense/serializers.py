@@ -1,10 +1,16 @@
+import csv
+import io
 from decimal import Decimal
 from django.db import transaction
+from django.db.models import Sum, Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from .models import Account, AccountType
-
+from .models import (
+    Account, AccountType, Budget, RecurringInterval, Transaction,
+    TransactionStatus, TransactionType
+)
 
 class AccountSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -19,14 +25,8 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = (
-            "id",
-            "name", 
-            "type",
-            "balance",
-            "is_default",
-            "created_at",
-            "updated_at",
-            "user",
+            "id", "name", "type", "balance", "is_default",
+            "created_at", "updated_at", "user"
         )
         read_only_fields = ("id", "created_at", "updated_at")
 
@@ -52,87 +52,57 @@ class AccountSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         user = self.context["request"].user
         is_creation = self.instance is None
-
         if not is_creation and "balance" in attrs:
             raise ValidationError({
                 "balance": _("Balance cannot be modified directly. Use transactions instead.")
             })
-
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
         user = validated_data["user"]
         is_default = validated_data.get("is_default", False)
-
         user_accounts_count = Account.objects.filter(user=user).count()
         if user_accounts_count >= 10:
             raise ValidationError(_("Maximum of 10 accounts allowed per user."))
-
         if not user_accounts_count:
             validated_data["is_default"] = True
         elif is_default:
             Account.objects.filter(user=user, is_default=True).update(is_default=False)
-
         return super().create(validated_data)
 
     @transaction.atomic
     def update(self, instance, validated_data):
         if "name" in validated_data:
             name = validated_data["name"]
-            if Account.objects.filter(
-                user=instance.user, 
-                name__iexact=name
-            ).exclude(pk=instance.pk).exists():
-                raise ValidationError({
-                    "name": _("An account with this name already exists.")
-                })
-
+            if Account.objects.filter(user=instance.user, name__iexact=name).exclude(pk=instance.pk).exists():
+                raise ValidationError({"name": _("An account with this name already exists.")})
         is_default = validated_data.get("is_default", False)
-        
         if is_default and not instance.is_default:
-            Account.objects.filter(
-                user=instance.user, 
-                is_default=True
-            ).update(is_default=False)
+            Account.objects.filter(user=instance.user, is_default=True).update(is_default=False)
         elif "is_default" in validated_data and not is_default and instance.is_default:
             if not Account.objects.filter(user=instance.user).exclude(pk=instance.pk).exists():
-                raise ValidationError({
-                    "is_default": _("Cannot unset default on the only account.")
-                })
-
+                raise ValidationError({"is_default": _("Cannot unset default on the only account.")})
         return super().update(instance, validated_data)
+
 
 class AccountListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = (
-            "id",
-            "name",
-            "type", 
-            "balance",
-            "is_default",
-            "created_at",
-            "updated_at"
-        )
+        fields = ("id", "name", "type", "balance", "is_default", "created_at", "updated_at")
         read_only_fields = fields
+
 
 class SetDefaultAccountSerializer(serializers.Serializer):
     @transaction.atomic
     def save(self):
         account = self.context["account"]
         user = account.user
-        
         Account.objects.filter(user=user, is_default=True).update(is_default=False)
         account.is_default = True
         account.save(update_fields=["is_default", "updated_at"])
         return account
 
-
-from django.utils import timezone
-from .models import Transaction, Account, TransactionType, TransactionStatus, RecurringInterval
-import csv
-import io
 
 class TransactionSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -147,8 +117,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             "next_recurring_date", "last_processed", "status", "account",
             "account_name", "account_type", "created_at", "updated_at", "user"
         )
-        read_only_fields = ("id", "created_at", "updated_at",
-                            "last_processed", "account_name", "account_type")
+        read_only_fields = ("id", "created_at", "updated_at", "last_processed", "account_name", "account_type")
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -163,13 +132,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         is_recurring = attrs.get("is_recurring", False)
         recurring_interval = attrs.get("recurring_interval")
         if is_recurring and not recurring_interval:
-            raise ValidationError({
-                "recurring_interval": _("Recurring interval is required for recurring transactions.")
-            })
+            raise ValidationError({"recurring_interval": _("Recurring interval is required for recurring transactions.")})
         if not is_recurring and recurring_interval:
-            raise ValidationError({
-                "recurring_interval": _("Recurring interval should not be set for non-recurring transactions.")
-            })
+            raise ValidationError({"recurring_interval": _("Recurring interval should not be set for non-recurring transactions.")})
         if is_recurring and recurring_interval and not attrs.get("next_recurring_date"):
             current_date = attrs.get("date", timezone.now())
             interval_mapping = {
@@ -222,13 +187,9 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
         is_recurring = attrs.get("is_recurring", False)
         recurring_interval = attrs.get("recurring_interval")
         if is_recurring and not recurring_interval:
-            raise ValidationError({
-                "recurring_interval": _("Recurring interval is required for recurring transactions.")
-            })
+            raise ValidationError({"recurring_interval": _("Recurring interval is required for recurring transactions.")})
         if not is_recurring and recurring_interval:
-            raise ValidationError({
-                "recurring_interval": _("Recurring interval should not be set for non-recurring transactions.")
-            })
+            raise ValidationError({"recurring_interval": _("Recurring interval should not be set for non-recurring transactions.")})
         if not attrs.get("date"):
             attrs["date"] = timezone.now()
         if is_recurring and recurring_interval:
@@ -259,23 +220,17 @@ class BulkTransactionCreateSerializer(serializers.Serializer):
         csv_file = validated_data['csv_file']
         user = self.context['request'].user
         try:
-            user_accounts = {
-                str(account.id): account
-                for account in Account.objects.filter(user=user).select_related('user')
-            }
+            user_accounts = {str(account.id): account for account in Account.objects.filter(user=user).select_related('user')}
         except Exception:
             user_accounts = {}
         try:
             content = csv_file.read().decode('utf-8')
             csv_rows = csv.DictReader(io.StringIO(content))
         except Exception as error:
-            return {'created_transactions': [], 'success_count': 0,
-                    'errors': [{'error': f'Failed to read CSV: {error}'}],
-                    'total_rows': 0}
+            return {'created_transactions': [], 'success_count': 0, 'errors': [{'error': f'Failed to read CSV: {error}'}], 'total_rows': 0}
 
         required_fields = ['type', 'amount', 'category', 'date', 'account_id']
         transactions_to_create, errors = [], []
-
         for row_index, row in enumerate(csv_rows, start=1):
             missing_fields = [field for field in required_fields if not row.get(field)]
             if missing_fields:
@@ -338,44 +293,16 @@ class UpdateTransactionStatusSerializer(serializers.Serializer):
             transaction_obj.save(update_fields=["status", "updated_at"])
         return transaction_obj
 
-
-
-
-
-from decimal import Decimal
-from django.db import transaction
-from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from django.utils import timezone
-from django.db.models import Sum, Q
-from .models import Budget, Transaction, TransactionType, TransactionStatus
-
-
 class BudgetSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    current_month_expenses = serializers.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        read_only=True
-    )
-    budget_utilization_percentage = serializers.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        read_only=True
-    )
+    current_month_expenses = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    budget_utilization_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
     
     class Meta:
         model = Budget
         fields = (
-            "id",
-            "amount",
-            "current_month_expenses",
-            "budget_utilization_percentage", 
-            "last_alert_sent",
-            "created_at",
-            "updated_at",
-            "user",
+            "id", "amount", "current_month_expenses", "budget_utilization_percentage", 
+            "last_alert_sent", "created_at", "updated_at", "user"
         )
         read_only_fields = ("id", "created_at", "updated_at", "last_alert_sent")
 
@@ -391,23 +318,15 @@ class BudgetSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         user = self.context["request"].user
         is_creation = self.instance is None
-        
-        # Prevent multiple budgets per user
         if is_creation and Budget.objects.filter(user=user).exists():
-            raise ValidationError({
-                "user": _("User can only have one budget. Update existing budget instead.")
-            })
-        
+            raise ValidationError({"user": _("User can only have one budget. Update existing budget instead.")})
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
         user = validated_data["user"]
-        
-        # Double-check budget uniqueness
         if Budget.objects.filter(user=user).exists():
             raise ValidationError(_("User already has a budget."))
-        
         return super().create(validated_data)
 
     @transaction.atomic  
@@ -422,27 +341,14 @@ class BudgetSerializer(serializers.ModelSerializer):
 
 
 class BudgetListSerializer(serializers.ModelSerializer):
-    current_month_expenses = serializers.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        read_only=True
-    )
-    budget_utilization_percentage = serializers.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        read_only=True
-    )
+    current_month_expenses = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    budget_utilization_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
     
     class Meta:
         model = Budget
         fields = (
-            "id",
-            "amount",
-            "current_month_expenses",
-            "budget_utilization_percentage",
-            "last_alert_sent",
-            "created_at",
-            "updated_at"
+            "id", "amount", "current_month_expenses", "budget_utilization_percentage",
+            "last_alert_sent", "created_at", "updated_at"
         )
         read_only_fields = fields
 
