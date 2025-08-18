@@ -18,8 +18,6 @@ import CountUp from '../../components/react-bits/CountUp';
 import { stats, features, problems, steps, testimonials, pricingPlans } from './landing_data';
 import { Award, Sparkles, Rocket, ArrowRight, Target, CheckCircle, Star, Zap } from 'lucide-react';
 
-import Particles from '@/components/react-bits/Particles';
-
 const staggerContainer = {
   animate: {
     transition: {
