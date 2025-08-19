@@ -7,6 +7,17 @@ import { useNavigate, Link } from 'react-router';
 const Dashboard = () => {
   const {user, logout} = useAuth();
   console.log("dsfa");
+  function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+// Usage
+const accessToken = getCookie('access_token');
+console.log(accessToken);
+
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -16,6 +27,8 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.username || 'User'}!</h1>
               <p className="text-muted-foreground">
                 Here's what's happening with your account today.
+            {user.access_token?user.access_token:"nothing"}
+            {localStorage.getItem("access_token")?localstorage.getItem("access_token"):"nothing"}
               </p>
             </div>
             <Button 

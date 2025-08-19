@@ -33,10 +33,10 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 class Stock(TimeStampedModel):
-    symbol = models.CharField(max_length=20, unique=True, db_index=True)
+    symbol = models.CharField(max_length=50, unique=True, db_index=True)
     name = models.CharField(max_length=200, db_index=True)
-    exchange = models.CharField(max_length=20, db_index=True)
-    sector = models.CharField(max_length=10, choices=SectorChoices.choices, default=SectorChoices.OTHER, db_index=True)
+    exchange = models.CharField(max_length=50, db_index=True)
+    sector = models.CharField(max_length=50, choices=SectorChoices.choices, default=SectorChoices.OTHER, db_index=True)
     current_price = models.DecimalField(max_digits=15, decimal_places=4, default=Decimal('0.0000'), validators=[MinValueValidator(Decimal('0.0000'))])
     previous_close = models.DecimalField(max_digits=15, decimal_places=4, default=Decimal('0.0000'), validators=[MinValueValidator(Decimal('0.0000'))])
     market_cap = models.BigIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])

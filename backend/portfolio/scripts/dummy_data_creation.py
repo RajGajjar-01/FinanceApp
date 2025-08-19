@@ -9,11 +9,7 @@ def run():
     
     # Get or create test user
     user, created = UserCustom.objects.get_or_create(
-        email="testuser@example.com",
-        defaults={
-            "username": "testuser",
-            "password": "testpass123"
-        }
+        email="programmingnotesbyraj@gmail.com",
     )
     print(f"User: {user} ({'created' if created else 'existing'})")
     

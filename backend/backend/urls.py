@@ -28,5 +28,5 @@ urlpatterns = [
     path('auth/google/callback/', user_views.google_auth_callback, name='google_auth_callback'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', user_views.token_refresh_view, name='token_refresh'),
-    path("api/", include("stock.urls")),
+    path("api/", include("portfolio.urls")),
 ]
