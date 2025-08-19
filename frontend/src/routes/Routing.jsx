@@ -3,12 +3,12 @@ import { Routes, Route } from 'react-router';
 import Landing from '@/pages/landing/landing_page';
 import Register from '@/pages/auth/register';
 import Login from '@/pages/auth/login';
-import Dashboard2 from '@/pages/maindash';
+import Dashboard2 from '@/pages/dashoard/dashboard_page';
 
-const Dashboard = lazy(() => import('../pages/dashoard/dashboad_page'));
+const Profile = lazy(() => import('../pages/auth/profile_page'));
 const OTPVerification = lazy(() => import('@/pages/auth/register-redirect'));
-const Main = lazy(() => import('@/pages/dashoard/main2'));
-const Tracker = lazy(() => import('@/pages/dashoard/tracker'));
+const Dashboard = lazy(() => import('@/pages/dashoard/dashboard_page'));
+const Tracker = lazy(() => import('@/pages/tracker/tracker_page'));
 
 import ProtectedRoute from './ProtectedRoute';
 
@@ -24,14 +24,29 @@ function Routing() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<OTPVerification />} />
-          <Route path="/tracker" element={<Tracker />} />
-          <Route path="/maindash" element={<Dashboard2/>} />
-          <Route path="/main" element={<Main />} />
+          <Route path="/maindash" element={<Dashboard2 />} />
+
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tracker"
+            element={
+              <ProtectedRoute>
+                <Tracker />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />

@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/auth-context';
 import { User, Mail, Calendar, Activity, LogOut } from 'lucide-react';
 import { useNavigate, Link } from 'react-router';
 
-const Dashboard = () => {
+const Profile = () => {
   const {user, logout} = useAuth();
   return (
     <div className="min-h-screen">
@@ -122,4 +122,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Profile;

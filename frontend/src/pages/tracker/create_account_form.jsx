@@ -57,7 +57,7 @@ const CreateAccountForm = ({ children, onAccountCreate }) => {
       name: '',
       type: 'Current',
       balance: '',
-      isDefault: true, // Changed from false to true
+      isDefault: true,
     },
   });
 
