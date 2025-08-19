@@ -15,6 +15,8 @@ import ProtectedRoute from './ProtectedRoute';
 
 import { Suspense } from 'react';
 import PageLoader from '../components/page-loader';
+import AllTransaction from '@/pages/all transaction/all-transaction';
+import AddTransactionForm from '@/pages/all transaction/addTransaction-form';
 
 function Routing() {
   return (
@@ -26,6 +28,8 @@ function Routing() {
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<OTPVerification />} />
           <Route path="/maindash" element={<Dashboard2 />} />
+          <Route path="/all-transactions" element={<AllTransaction />} />
+          <Route path="/add-transaction" element={<AddTransactionForm />} />
 
           <Route
             path="/dashboard"

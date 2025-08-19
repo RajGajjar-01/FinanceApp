@@ -50,7 +50,7 @@ const PortfolioReturn = () => {
   }, []);
 
   return (
-    <Card className="bg-primary/7 p-5 w-150 max-w-4xl h-[280px] flex flex-col" role="region" aria-labelledby="portfolio-return-title">
+    <Card className="bg-primary/7 p-5 h-[245px] " role="region" aria-labelledby="portfolio-return-title">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 id="portfolio-return-title" className="text-sm text-gray-400 uppercase tracking-wide">
@@ -72,7 +72,7 @@ const PortfolioReturn = () => {
       {/* Chart */}
       <div className="flex-1 relative">
         {/* Y-axis Labels - Positioned correctly with 0 at bottom */}
-        <div className="absolute left-0 top-0 h-40 flex flex-col justify-between text-xs text-gray-500 py-2 z-10 w-12">
+        <div className="absolute left-0 top-0 h-35 flex flex-col justify-between text-xs text-gray-500 py-2 z-10 w-12">
           {reversedYAxisLabels.map((label, i) => (
             <span key={i} aria-label={`Chart scale: ${label}`} className="leading-none">
               {label}

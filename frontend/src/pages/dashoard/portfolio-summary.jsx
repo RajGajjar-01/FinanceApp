@@ -6,7 +6,7 @@ import { portfolioSummary } from './PortfoliodummyData';
 
 const PortfolioSummary = () => {
   return (
-      <Card className="bg-primary/7 p-5 max-w-md">
+      <Card className="bg-primary/7 p-5  h-[245px]">
         <p className="text-sm text-gray-400 uppercase tracking-wide">Current Value</p>
         <Card className="bg-primary/7 p-4 ">
           <div className="flex justify-between items-start">
