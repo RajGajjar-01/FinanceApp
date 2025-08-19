@@ -18,6 +18,9 @@ import CountUp from '../../components/react-bits/CountUp';
 import { stats, features, problems, steps, testimonials, pricingPlans } from './landing_data';
 import { Award, Sparkles, Rocket, ArrowRight, Target, CheckCircle, Star, Zap } from 'lucide-react';
 
+import { useAuth } from '@/contexts/auth-context';
+import Navbar from '@/components/navbar';
+
 const staggerContainer = {
   animate: {
     transition: {
@@ -132,10 +135,13 @@ const cardHover = {
 
 const Landing = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
+  const { user } = useAuth();
 
   return (
     <>
-      <Header />
+      {
+        user? (<Navbar />) : (<Header />)
+      }
       <div className="min-h-screen overflow-hidden">
         {/* Hero Section - Fixed: Added better large screen responsiveness */}
         <section className="relative min-h-screen flex items-center justify-center py-20">

@@ -48,7 +48,7 @@ def run():
                 "current_price": Decimal(str(stock_data["current"])),
                 "previous_close": Decimal(str(stock_data["previous"])),
                 "market_cap": stock_data["cap"],
-                "currency": "USD"
+                # "currency": "USD"
             }
         )
         created_stocks.append(stock)
