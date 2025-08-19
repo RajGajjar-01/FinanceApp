@@ -8,7 +8,8 @@ import Dashboard2 from '@/pages/dashoard/dashboard_page';
 const Profile = lazy(() => import('../pages/auth/profile_page'));
 const OTPVerification = lazy(() => import('@/pages/auth/register-redirect'));
 const Dashboard = lazy(() => import('@/pages/dashoard/dashboard_page'));
-const Tracker = lazy(() => import('@/pages/tracker/tracker_page'));
+const Tracker = lazy(() => import('@/pages/tracker/tracker-page'));
+const Portfolio = lazy(() => import('@/pages/portfolio/portfolio-page'));
 
 import ProtectedRoute from './ProtectedRoute';
 
@@ -47,6 +48,14 @@ function Routing() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/portfolio"
+            element={
+              <ProtectedRoute>
+                <Portfolio />
               </ProtectedRoute>
             }
           />

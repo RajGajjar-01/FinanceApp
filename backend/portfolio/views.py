@@ -11,8 +11,9 @@ from .serializers import (
     PortfolioSerializer, PortfolioListSerializer, PortfolioCreateSerializer,
     PortfolioSummarySerializer, WishlistSerializer, WishlistListSerializer, 
     WishlistCreateSerializer, ToggleWishlistAlertsSerializer, PriceAlertSerializer, 
-    PriceAlertListSerializer, UpdatePriceAlertStatusSerializer
+    PriceAlertListSerializer, UpdatePriceAlertStatusSerializer , AddToPortfolioBySymbolSerializer
 )
+from portfolio.services.portfolio_service import add_stock_to_portfolio_by_symbol
 
 
 class StockViewSet(viewsets.ReadOnlyModelViewSet):
@@ -471,6 +472,25 @@ class PortfolioViewSet(viewsets.ModelViewSet):
             return self._get_sorted_holdings(request, reverse=False)
         except Exception as error:
             return create_error_response(_("Failed to retrieve worst performers."), errors=[str(error)])
+    
+
+    @action(detail=False, methods=['post'], url_path='add-by-symbol')
+    def add_by_symbol(self, request):
+        """
+        Add/merge a holding by stock symbol. This path performs:
+        Finnhub fetch -> Groq description -> Stock upsert -> Portfolio DCA merge -> Summary refresh
+        """
+        try:
+            serializer = AddToPortfolioBySymbolSerializer(data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            result = add_stock_to_portfolio_by_symbol(request.user, serializer.validated_data)
+            return create_success_response(
+                _("Stock added to portfolio successfully."),
+                data=result,
+                status_code=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return create_error_response(_("Failed to add stock to portfolio."), errors=[str(e)])
 
 
 class WishlistViewSet(viewsets.ModelViewSet):

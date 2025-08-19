@@ -12,7 +12,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
 
-// Constants
 const NAV_ITEMS = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'Tracker', href: '/tracker' },

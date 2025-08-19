@@ -385,3 +385,33 @@ class RefreshPortfolioSummarySerializer(serializers.Serializer):
         
         summary = PortfolioSummary.refresh_for_user(user)
         return summary
+
+
+class AddToPortfolioBySymbolSerializer(serializers.Serializer):
+    symbol = serializers.CharField()
+    shares_owned = serializers.DecimalField(max_digits=15, decimal_places=4)
+    purchase_price = serializers.DecimalField(max_digits=15, decimal_places=4)
+    purchase_date = serializers.DateField()
+    notes = serializers.CharField(required=False, allow_blank=True)
+    investment_thesis = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_symbol(self, value):
+        v = value.strip().upper()
+        if not v:
+            raise ValidationError("Symbol cannot be empty.")
+        return v
+
+    def validate_shares_owned(self, value: Decimal):
+        if value <= Decimal("0"):
+            raise ValidationError("Shares must be greater than zero.")
+        return value
+
+    def validate_purchase_price(self, value: Decimal):
+        if value <= Decimal("0"):
+            raise ValidationError("Purchase price must be greater than zero.")
+        return value
+
+    def validate_purchase_date(self, value):
+        if value > timezone.now().date():
+            raise ValidationError("Purchase date cannot be in the future.")
+        return value
