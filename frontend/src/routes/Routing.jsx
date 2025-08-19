@@ -3,11 +3,11 @@ import { Routes, Route } from 'react-router';
 import Landing from '@/pages/landing/landing_page';
 import Register from '@/pages/auth/register';
 import Login from '@/pages/auth/login';
-import Dashboard2 from '@/pages/dashoard/dashboard_page';
+import Dashboard2 from '@/pages/dashoard/dashboard-page';
 
 const Profile = lazy(() => import('../pages/auth/profile_page'));
 const OTPVerification = lazy(() => import('@/pages/auth/register-redirect'));
-const Dashboard = lazy(() => import('@/pages/dashoard/dashboard_page'));
+const Dashboard = lazy(() => import('@/pages/dashoard/dashboard-page'));
 const Tracker = lazy(() => import('@/pages/tracker/tracker-page'));
 const Portfolio = lazy(() => import('@/pages/portfolio/portfolio-page'));
 
