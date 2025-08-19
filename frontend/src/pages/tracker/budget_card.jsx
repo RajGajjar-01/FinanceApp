@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -10,138 +10,55 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Check, X, Pencil, Plus } from 'lucide-react';
-import { useAuth } from '@/contexts/auth-context';
+import { useTracker } from '@/contexts/tracker-context';
 
 const BudgetCard = () => {
-  const [budgetData, setBudgetData] = useState({
-    id: '',
-    amount: 0,
-    spent: 0,
-    exists: false
-  });
-  const [editState, setEditState] = useState({
-    isEditing: false,
-    newAmount: '0',
-    isUpdating: false
-  });
-  const [createState, setCreateState] = useState({
-    isCreating: false,
-    createAmount: '',
-    isSubmitting: false  // Added separate submitting state
-  });
-  const [uiState, setUiState] = useState({
-    isLoading: true,
-    error: ''
-  });
+  const {
+    budget,
+    percentUsed,
+    fetchBudgetData,
+    createBudget,
+    updateBudget,
+    startEditingBudget,
+    cancelEditingBudget,
+    startCreatingBudget,
+    cancelCreatingBudget,
+    updateBudgetCreateAmount,
+    updateBudgetEditAmount,
+  } = useTracker();
+
   const inputRef = useRef(null);
   const createInputRef = useRef(null);
-  const { axiosPrivate } = useAuth();
 
   useEffect(() => {
-    fetchBudgetData();
-  }, []);
-
-  useEffect(() => {
-    if (editState.isEditing && inputRef.current) {
+    if (budget.edit.isEditing && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [editState.isEditing]);
+  }, [budget.edit.isEditing]);
 
   useEffect(() => {
-    if (createState.isCreating && createInputRef.current) {
+    if (budget.create.isCreating && createInputRef.current) {
       createInputRef.current.focus();
     }
-  }, [createState.isCreating]);
+  }, [budget.create.isCreating]);
 
-  const fetchBudgetData = async () => {
-    setUiState({ isLoading: true, error: '' });
-
-    try {
-      const response = await axiosPrivate.get('/expense/budget/');
-      console.log(response.data);
-      const results = response.data?.data?.results;
-
-      if (Array.isArray(results) && results.length > 0) {
-        const budget = results[0];
-        const amount = parseFloat(budget.amount) || 0;
-
-        setBudgetData({
-          id: budget.id,
-          amount,
-          spent: budget.current_month_expenses || 0,
-          exists: true
-        });
-        setEditState(prev => ({ ...prev, newAmount: amount.toString() }));
-      } else {
-        setBudgetData({ id: '', amount: 0, spent: 0, exists: false });
-      }
-    } catch (err) {
-      setUiState({ isLoading: false, error: 'Failed to load budget data' });
-      setBudgetData({ id: '', amount: 0, spent: 0, exists: false });
-      return;
-    }
-
-    setUiState({ isLoading: false, error: '' });
+  const handleCreateBudget = async () => {
+    await createBudget(budget.create.createAmount);
   };
 
-  const createBudget = async () => {
-    const parsedAmount = parseFloat(createState.createAmount);
-
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setUiState(prev => ({ ...prev, error: 'Please enter a valid budget amount' }));
-      setTimeout(() => setUiState(prev => ({ ...prev, error: '' })), 3000);
-      return;
-    }
-
-    // Set submitting state to true while keeping isCreating true
-    setCreateState(prev => ({ ...prev, isSubmitting: true }));
-    setUiState(prev => ({ ...prev, error: '' }));
-
-    try {
-      const response = await axiosPrivate.post('/expense/budget/', {
-        amount: parsedAmount
-      });
-
-      if (response.data?.success) {
-        // Handle different possible response structures
-        let newBudget;
-        if (response.data?.data?.results && Array.isArray(response.data.data.results)) {
-          newBudget = response.data.data.results[0];
-        } else if (response.data?.data) {
-          newBudget = response.data.data;
-        } else {
-          newBudget = response.data;
-        }
-
-        const amount = parseFloat(newBudget.amount) || 0;
-        
-        setBudgetData({
-          id: newBudget.id,
-          amount,
-          spent: newBudget.current_month_expenses || 0,
-          exists: true
-        });
-        setEditState(prev => ({ ...prev, newAmount: amount.toString() }));
-        
-        // Reset create state completely
-        setCreateState({ isCreating: false, createAmount: '', isSubmitting: false });
-        setUiState(prev => ({ ...prev, error: '' }));
-      } else {
-        throw new Error(response.data?.message || 'Failed to create budget');
-      }
-    } catch (err) {
-      console.error('Create budget error:', err);
-      setCreateState(prev => ({ ...prev, isSubmitting: false }));
-      setUiState(prev => ({ 
-        ...prev, 
-        error: err.response?.data?.message || err.message || 'Failed to create budget' 
-      }));
-      setTimeout(() => setUiState(prev => ({ ...prev, error: '' })), 5000);
-    }
+  const handleUpdateBudget = async () => {
+    await updateBudget(budget.edit.newAmount);
   };
 
-  const percentUsed = budgetData.amount > 0 ? (budgetData.spent / budgetData.amount) * 100 : 0;
-  const remaining = budgetData.amount - budgetData.spent;
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') handleUpdateBudget();
+    if (e.key === 'Escape') cancelEditingBudget();
+  };
+
+  const handleCreateKeyPress = (e) => {
+    if (e.key === 'Enter') handleCreateBudget();
+    if (e.key === 'Escape') cancelCreatingBudget();
+  };
 
   const getProgressColorClass = () => {
     if (percentUsed >= 90) return 'text-red-600 dark:text-red-400';
@@ -149,69 +66,9 @@ const BudgetCard = () => {
     return 'text-green-600 dark:text-green-400';
   };
 
-  const handleUpdateBudget = async () => {
-    const parsedAmount = parseFloat(editState.newAmount);
+  const remaining = budget.data.amount - budget.data.spent;
 
-    if (isNaN(parsedAmount) || parsedAmount < 0 || !budgetData.id) {
-      setEditState(prev => ({ ...prev, newAmount: budgetData.amount.toString(), isEditing: false }));
-      return;
-    }
-
-    setEditState(prev => ({ ...prev, isUpdating: true }));
-
-    try {
-      const response = await axiosPrivate.put(`/expense/budget/${budgetData.id}/`, {
-        amount: parsedAmount
-      });
-
-      if (response.data?.success) {
-        setBudgetData(prev => ({ ...prev, amount: parsedAmount }));
-        setEditState({ isEditing: false, newAmount: parsedAmount.toString(), isUpdating: false });
-      } else {
-        throw new Error('Update failed');
-      }
-    } catch (err) {
-      setEditState(prev => ({ 
-        ...prev, 
-        newAmount: budgetData.amount.toString(), 
-        isEditing: false, 
-        isUpdating: false 
-      }));
-      setUiState(prev => ({ ...prev, error: 'Failed to update budget' }));
-      setTimeout(() => setUiState(prev => ({ ...prev, error: '' })), 3000);
-    }
-  };
-
-  const handleCancel = () => {
-    setEditState(prev => ({ 
-      ...prev, 
-      newAmount: budgetData.amount.toString(), 
-      isEditing: false 
-    }));
-  };
-
-  const handleCreateCancel = () => {
-    setCreateState({ isCreating: false, createAmount: '', isSubmitting: false });
-    setUiState(prev => ({ ...prev, error: '' }));
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleUpdateBudget();
-    if (e.key === 'Escape') handleCancel();
-  };
-
-  const handleCreateKeyPress = (e) => {
-    if (e.key === 'Enter') createBudget();
-    if (e.key === 'Escape') handleCreateCancel();
-  };
-
-  // Show "Create Budget" button to start the process
-  const handleStartCreate = () => {
-    setCreateState(prev => ({ ...prev, isCreating: true }));
-    setUiState(prev => ({ ...prev, error: '' }));
-  };
-
-  if (uiState.isLoading) {
+  if (budget.ui.isLoading) {
     return (
       <Card className="w-full shadow-sm p-3">
         <div className="flex items-center justify-center h-32">
@@ -221,12 +78,12 @@ const BudgetCard = () => {
     );
   }
 
-  if (uiState.error && !budgetData.exists && !createState.isCreating) {
+  if (budget.ui.error && !budget.data.exists && !budget.create.isCreating) {
     return (
       <Card className="w-full shadow-sm p-3">
         <CardContent className="flex items-center justify-center h-32">
           <div className="text-center">
-            <p className="text-red-600 dark:text-red-400 mb-2">{uiState.error}</p>
+            <p className="text-red-600 dark:text-red-400 mb-2">{budget.ui.error}</p>
             <Button 
               variant="outline" 
               size="sm" 
@@ -241,18 +98,18 @@ const BudgetCard = () => {
     );
   }
 
-  if (!budgetData.exists) {
+  if (!budget.data.exists) {
     return (
       <Card className="w-full shadow-sm p-3">
         <CardContent className="flex items-center justify-center h-32">
           <div className="text-center w-full">
-            {uiState.error && (
+            {budget.ui.error && (
               <div className="mb-3 p-2 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs rounded">
-                {uiState.error}
+                {budget.ui.error}
               </div>
             )}
             
-            {createState.isCreating ? (
+            {budget.create.isCreating ? (
               <div className="space-y-3">
                 <p className="text-muted-foreground text-sm">Create Your Budget</p>
                 <div className="flex items-center justify-center gap-2">
@@ -261,24 +118,24 @@ const BudgetCard = () => {
                     <Input
                       ref={createInputRef}
                       type="number"
-                      value={createState.createAmount}
-                      onChange={(e) => setCreateState(prev => ({ ...prev, createAmount: e.target.value }))}
+                      value={budget.create.createAmount}
+                      onChange={(e) => updateBudgetCreateAmount(e.target.value)}
                       onKeyDown={handleCreateKeyPress}
                       className="w-24 h-8 text-sm px-2"
                       placeholder="0.00"
                       min="0"
                       step="0.01"
-                      disabled={createState.isSubmitting}
+                      disabled={budget.create.isSubmitting}
                     />
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={createBudget}
+                    onClick={handleCreateBudget}
                     className="h-8 w-8"
-                    disabled={createState.isSubmitting}
+                    disabled={budget.create.isSubmitting}
                   >
-                    {createState.isSubmitting ? (
+                    {budget.create.isSubmitting ? (
                       <div className="animate-spin rounded-full h-4 w-4 border border-green-600 border-t-transparent"></div>
                     ) : (
                       <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -287,9 +144,9 @@ const BudgetCard = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={handleCreateCancel}
+                    onClick={cancelCreatingBudget}
                     className="h-8 w-8"
-                    disabled={createState.isSubmitting}
+                    disabled={budget.create.isSubmitting}
                   >
                     <X className="h-4 w-4 text-red-600 dark:text-red-400" />
                   </Button>
@@ -302,7 +159,7 @@ const BudgetCard = () => {
                   variant="default" 
                   size="sm" 
                   className="text-xs"
-                  onClick={handleStartCreate}
+                  onClick={startCreatingBudget}
                 >
                   <Plus className="h-4 w-4 mr-1" />
                   Create Budget
@@ -317,9 +174,9 @@ const BudgetCard = () => {
 
   return (
     <Card className="w-full shadow-sm p-3 transition-all duration-200 hover:shadow-md">
-      {uiState.error && (
+      {budget.ui.error && (
         <div className="mb-2 p-2 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs rounded">
-          {uiState.error}
+          {budget.ui.error}
         </div>
       )}
       
@@ -329,28 +186,28 @@ const BudgetCard = () => {
         </CardTitle>
 
         <div className="flex items-center gap-2">
-          {editState.isEditing ? (
+          {budget.edit.isEditing ? (
             <div className="flex items-center gap-1">
               <Input
                 ref={inputRef}
                 type="number"
-                value={editState.newAmount}
-                onChange={(e) => setEditState(prev => ({ ...prev, newAmount: e.target.value }))}
+                value={budget.edit.newAmount}
+                onChange={(e) => updateBudgetEditAmount(e.target.value)}
                 onKeyDown={handleKeyPress}
                 className="w-20 h-6 text-sm px-1"
                 placeholder="Enter amount"
                 min="0"
                 step="0.01"
-                disabled={editState.isUpdating}
+                disabled={budget.edit.isUpdating}
               />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleUpdateBudget}
                 className="h-6 w-6"
-                disabled={editState.isUpdating}
+                disabled={budget.edit.isUpdating}
               >
-                {editState.isUpdating ? (
+                {budget.edit.isUpdating ? (
                   <div className="animate-spin rounded-full h-3 w-3 border border-green-600 border-t-transparent"></div>
                 ) : (
                   <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -359,9 +216,9 @@ const BudgetCard = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleCancel}
+                onClick={cancelEditingBudget}
                 className="h-6 w-6"
-                disabled={editState.isUpdating}
+                disabled={budget.edit.isUpdating}
               >
                 <X className="h-4 w-4 text-red-600 dark:text-red-400" />
               </Button>
@@ -369,12 +226,12 @@ const BudgetCard = () => {
           ) : (
             <div className="flex items-center gap-1 mt-1">
               <CardDescription className="text-xs">
-                ${budgetData.spent.toFixed(2)} of ${budgetData.amount.toFixed(2)} spent
+                ${budget.data.spent.toFixed(2)} of ${budget.data.amount.toFixed(2)} spent
               </CardDescription>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setEditState(prev => ({ ...prev, isEditing: true }))}
+                onClick={startEditingBudget}
                 className="h-4 w-5 ml-0.5"
               >
                 <Pencil className="h-4 w-3 text-muted-foreground" />
@@ -406,7 +263,7 @@ const BudgetCard = () => {
 
         <div className="grid grid-cols-2 gap-1 pt-2 mt-2 border-t border-border">
           <div className="text-center">
-            <p className="text-sm font-bold">${budgetData.spent.toFixed(2)}</p>
+            <p className="text-sm font-bold">${budget.data.spent.toFixed(2)}</p>
             <p className="text-xs text-muted-foreground">Spent</p>
           </div>
           <div className="text-center">
