@@ -70,11 +70,8 @@ def add_stock_to_portfolio_by_symbol(user, data: dict) -> dict:
         holding.shares_owned = new_shares
         holding.purchase_price = new_avg_price
         holding.notes = (holding.notes or "")
-        if notes:
-            holding.notes = f"{holding.notes}\n{notes}".strip()
-        # prefer explicit override; else append Groq thesis if empty
-
-        # keep earliest purchase_date
+    
+    # keep earliest purchase_date
         if purchase_date < holding.purchase_date:
             holding.purchase_date = purchase_date
         holding.save()
@@ -90,7 +87,7 @@ def add_stock_to_portfolio_by_symbol(user, data: dict) -> dict:
             is_active=True,
         )
 
-    # 5) Refresh summary
+    
     summary = PortfolioSummary.refresh_for_user(user)
 
     return {

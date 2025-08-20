@@ -13,6 +13,7 @@ dependencies = [
     "djangorestframework>=3.16.0",
     "djangorestframework-simplejwt>=5.5.0",
     "isort>=6.0.1",
+    "pillow>=11.3.0",
     "psycopg2-binary>=2.9.10",
     "pytest-playwright>=0.7.0",
     "python-decouple>=3.8",

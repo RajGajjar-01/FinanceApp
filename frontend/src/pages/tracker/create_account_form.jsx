@@ -22,13 +22,14 @@ import {
 import { Switch } from '@/components/ui/switch';
 
 import { z } from 'zod';
+import { useTracker } from '@/contexts/tracker-context';
 
 const accountSchema = z.object({
   name: z
     .string()
     .min(1, 'Account name is required')
     .max(50, 'Account name must be less than 50 characters'),
-  type: z.enum(['Current', 'Savings'], {
+  type: z.enum(['CURRENT', 'SAVINGS'], {
     required_error: 'Please select an account type',
   }),
   balance: z
@@ -43,6 +44,7 @@ const accountSchema = z.object({
 const CreateAccountForm = ({ children, onAccountCreate }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const {addAccount, handleAccountSelection} = useTracker();
 
   const {
     register,
@@ -55,7 +57,7 @@ const CreateAccountForm = ({ children, onAccountCreate }) => {
     resolver: zodResolver(accountSchema),
     defaultValues: {
       name: '',
-      type: 'Current',
+      type: 'CURRENT',
       balance: '',
       isDefault: true,
     },
@@ -63,34 +65,28 @@ const CreateAccountForm = ({ children, onAccountCreate }) => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      const newAccount = {
-        id: Date.now(), // Simple ID generation for demo
-        name: data.name,
-        type: data.type,
-        balance: parseFloat(data.balance),
-        isDefault: data.isDefault,
-      };
-
-      onAccountCreate(newAccount);
+    try {
+      const result = await addAccount(data);
+      if (result.success && data.isDefault) {
+        await handleAccountSelection(result.account.id);
+      }
       reset();
       setOpen(false);
-      setIsLoading(false);
-
-      // You can add toast notification here
       console.log('Account created successfully');
-    }, 1000);
+    } catch (error) {
+      console.error('Failed to create account:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     if (open) {
       reset({
         name: '',
-        type: 'Current',
+        type: 'CURRENT',
         balance: '',
-        isDefault: true, 
+        isDefault: true,
       });
     }
   }, [open, reset]);
@@ -102,7 +98,7 @@ const CreateAccountForm = ({ children, onAccountCreate }) => {
         <DrawerHeader>
           <DrawerTitle>Create New Account</DrawerTitle>
         </DrawerHeader>
-        <div className="px-4 pb-4 font-space-grotesk" >
+        <div className="px-4 pb-4 font-space-grotesk">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Account Name */}
             <div className="space-y-2">
@@ -132,8 +128,8 @@ const CreateAccountForm = ({ children, onAccountCreate }) => {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Current">Current</SelectItem>
-                  <SelectItem value="Savings">Savings</SelectItem>
+                  <SelectItem value="CURRENT">Current</SelectItem>
+                  <SelectItem value="SAVINGS">Savings</SelectItem>
                 </SelectContent>
               </Select>
               {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}

@@ -1,13 +1,13 @@
-import Navbar from '@/components/navbar'
-import React from 'react'
+import Navbar from '@/components/navbar';
+import SectorBarChart from './sector-chart';
 
 const Portfolio = () => {
   return (
-    <>  
-        <Navbar/>
-        <h1>Hello</h1>
+    <>
+      <Navbar />
+      <SectorBarChart />
     </>
-  )
-}
+  );
+};
 
 export default Portfolio;

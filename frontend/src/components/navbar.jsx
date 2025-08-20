@@ -25,7 +25,6 @@ const ANIMATIONS = {
   icon: { initial: { rotate: 90, opacity: 0 }, animate: { rotate: 0, opacity: 1 }, exit: { rotate: -90, opacity: 0 } },
 };
 
-// Utility functions
 const getActiveStyles = (isActive, isMobile = false) => `
   flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium 
   transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary
@@ -33,10 +32,17 @@ const getActiveStyles = (isActive, isMobile = false) => `
   ${isActive ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-white hover:bg-accent/10'}
 `;
 
-const getUserInitials = (username) => 
-  username?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+const getUserInitials = (username) => {
+  if (!username) return 'U';
+  
+  const words = username.trim().split(/\s+/);
+  if (words.length === 1) {
+    return words[0].slice(0, 2).toUpperCase();
+  }
+  
+  return words.map(word => word[0]).join('').slice(0, 2).toUpperCase();
+};
 
-// Memoized Components
 const NavLink = memo(({ item, isActive, onClick, isMobile }) => (
   <motion.div {...(isMobile && { initial: { opacity: 0, x: -20 }, animate: { opacity: 1, x: 0 } })}>
     <Link
@@ -67,18 +73,18 @@ const UserDropdown = memo(({ user, onLogout }) => {
         </button>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="center" className="mt-2 min-w-[200px]" sideOffset={8}>
+      <DropdownMenuContent align="center" className="mt-2 min-w-[200px] font-space-grotesk" sideOffset={8}>
         <motion.div {...ANIMATIONS.dropdown} transition={{ duration: 0.2 }}>
           <div className="px-3 py-2">
-            <p className="text-sm font-medium truncate">{user?.username || 'Unknown'}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            <p className="text-md font-semibold truncate">{user?.username || 'Unknown User'}</p>
+            <p className="text-md text-muted-foreground truncate">{user?.email || 'No email'}</p>
           </div>
           
           <DropdownMenuSeparator />
           
           {[
             { icon: User, label: 'Profile', href: '/profile' },
-            { icon: Settings, label: 'Settings', href: '/settings' }
+            { icon: Settings, label: 'Settings', href: '/settings' },
           ].map(({ icon: Icon, label, href }) => (
             <DropdownMenuItem key={href} className="cursor-pointer">
               <Icon size={16} className="mr-2" />
@@ -116,7 +122,6 @@ const MobileToggle = memo(({ isOpen, onClick }) => (
   </button>
 ));
 
-// Main Component
 const Navbar = memo(() => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { pathname } = useLocation();
@@ -153,7 +158,6 @@ const Navbar = memo(() => {
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
           <Link 
             to="/main" 
             className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
@@ -161,21 +165,18 @@ const Navbar = memo(() => {
             FinanceIQ
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItemsWithState.map(item => (
               <NavLink key={item.href} item={item} isActive={item.isActive} />
             ))}
           </nav>
 
-          {/* User Menu & Mobile Toggle */}
           <div className="flex items-center space-x-4">
             <UserDropdown user={user} onLogout={handleLogout} />
             <MobileToggle isOpen={isMobileMenuOpen} onClick={toggleMobileMenu} />
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div

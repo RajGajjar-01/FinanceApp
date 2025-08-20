@@ -15,27 +15,25 @@ def run():
     
     # Create more diverse stocks
     stocks_data = [
-        # Portfolio stocks (user will own these)
-        {"symbol": "AAPL", "name": "Apple Inc.", "exchange": "NASDAQ", "sector": "TECH", "current": 185.50, "previous": 183.20, "cap": 2900000000000},
-        {"symbol": "TSLA", "name": "Tesla Inc.", "exchange": "NASDAQ", "sector": "TECH", "current": 245.80, "previous": 240.15, "cap": 780000000000},
-        {"symbol": "JPM", "name": "JPMorgan Chase", "exchange": "NYSE", "sector": "FIN", "current": 155.30, "previous": 153.90, "cap": 450000000000},
-        {"symbol": "JNJ", "name": "Johnson & Johnson", "exchange": "NYSE", "sector": "HC", "current": 168.75, "previous": 167.20, "cap": 445000000000},
-        {"symbol": "XOM", "name": "Exxon Mobil", "exchange": "NYSE", "sector": "EN", "current": 118.90, "previous": 120.40, "cap": 485000000000},
+        {"symbol": "AAPL", "name": "Apple Inc.", "exchange": "NASDAQ", "sector": "Technology", "current": 185.50, "previous": 183.20, "cap": 2900000000000},
+        {"symbol": "TSLA", "name": "Tesla Inc.", "exchange": "NASDAQ", "sector": "Technology", "current": 245.80, "previous": 240.15, "cap": 780000000000},
+        {"symbol": "JPM", "name": "JPMorgan Chase", "exchange": "NYSE", "sector": "Financials", "current": 155.30, "previous": 153.90, "cap": 450000000000},
+        {"symbol": "JNJ", "name": "Johnson & Johnson", "exchange": "NYSE", "sector": "Healthcare", "current": 168.75, "previous": 167.20, "cap": 445000000000},
+        {"symbol": "XOM", "name": "Exxon Mobil", "exchange": "NYSE", "sector": "Energy", "current": 118.90, "previous": 120.40, "cap": 485000000000},
         
-        # Wishlist stocks (user watches but doesn't own)
-        {"symbol": "MSFT", "name": "Microsoft Corp", "exchange": "NASDAQ", "sector": "TECH", "current": 415.20, "previous": 412.80, "cap": 3080000000000},
-        {"symbol": "GOOGL", "name": "Alphabet Inc", "exchange": "NASDAQ", "sector": "TECH", "current": 145.90, "previous": 144.30, "cap": 1850000000000},
-        {"symbol": "AMZN", "name": "Amazon.com Inc", "exchange": "NASDAQ", "sector": "CONS", "current": 155.75, "previous": 157.20, "cap": 1620000000000},
-        {"symbol": "NVDA", "name": "NVIDIA Corp", "exchange": "NASDAQ", "sector": "TECH", "current": 875.40, "previous": 865.90, "cap": 2150000000000},
-        {"symbol": "BAC", "name": "Bank of America", "exchange": "NYSE", "sector": "FIN", "current": 35.85, "previous": 35.40, "cap": 285000000000},
+        {"symbol": "MSFT", "name": "Microsoft Corp", "exchange": "NASDAQ", "sector": "Technology", "current": 415.20, "previous": 412.80, "cap": 3080000000000},
+        {"symbol": "GOOGL", "name": "Alphabet Inc", "exchange": "NASDAQ", "sector": "Technology", "current": 145.90, "previous": 144.30, "cap": 1850000000000},
+        {"symbol": "AMZN", "name": "Amazon.com Inc", "exchange": "NASDAQ", "sector": "Consumer", "current": 155.75, "previous": 157.20, "cap": 1620000000000},
+        {"symbol": "NVDA", "name": "NVIDIA Corp", "exchange": "NASDAQ", "sector": "Technology", "current": 875.40, "previous": 865.90, "cap": 2150000000000},
+        {"symbol": "BAC", "name": "Bank of America", "exchange": "NYSE", "sector": "Financials", "current": 35.85, "previous": 35.40, "cap": 285000000000},
         
-        # Additional stocks (neither owned nor watched)
-        {"symbol": "WMT", "name": "Walmart Inc", "exchange": "NYSE", "sector": "CONS", "current": 165.30, "previous": 164.80, "cap": 535000000000},
-        {"symbol": "PG", "name": "Procter & Gamble", "exchange": "NYSE", "sector": "CONS", "current": 155.90, "previous": 156.20, "cap": 370000000000},
-        {"symbol": "HD", "name": "Home Depot", "exchange": "NYSE", "sector": "CONS", "current": 385.60, "previous": 383.40, "cap": 395000000000},
-        {"symbol": "V", "name": "Visa Inc", "exchange": "NYSE", "sector": "FIN", "current": 275.85, "previous": 274.20, "cap": 580000000000},
-        {"symbol": "UNH", "name": "UnitedHealth Group", "exchange": "NYSE", "sector": "HC", "current": 545.30, "previous": 543.80, "cap": 515000000000},
+        {"symbol": "WMT", "name": "Walmart Inc", "exchange": "NYSE", "sector": "Consumer", "current": 165.30, "previous": 164.80, "cap": 535000000000},
+        {"symbol": "PG", "name": "Procter & Gamble", "exchange": "NYSE", "sector": "Consumer", "current": 155.90, "previous": 156.20, "cap": 370000000000},
+        {"symbol": "HD", "name": "Home Depot", "exchange": "NYSE", "sector": "Consumer", "current": 385.60, "previous": 383.40, "cap": 395000000000},
+        {"symbol": "V", "name": "Visa Inc", "exchange": "NYSE", "sector": "Financials", "current": 275.85, "previous": 274.20, "cap": 580000000000},
+        {"symbol": "UNH", "name": "UnitedHealth Group", "exchange": "NYSE", "sector": "Healthcare", "current": 545.30, "previous": 543.80, "cap": 515000000000},
     ]
+
     
     created_stocks = []
     for stock_data in stocks_data:

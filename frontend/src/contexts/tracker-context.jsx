@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 
-const TrackerContext = createContext();
+const TrackerContext = createContext(null);
 
 export const useTracker = () => {
   const context = useContext(TrackerContext);
@@ -13,7 +13,6 @@ export const useTracker = () => {
 
 export const TrackerProvider = ({ children }) => {
   const { axiosPrivate } = useAuth();
-
   const [budget, setBudget] = useState({
     data: { id: '', amount: 0, spent: 0, exists: false },
     edit: { isEditing: false, newAmount: '0', isUpdating: false },
@@ -22,87 +21,253 @@ export const TrackerProvider = ({ children }) => {
   });
 
   const [accountsState, setAccountsState] = useState({
-    list: JSON.parse(localStorage.getItem('userAccounts') || '[]'),
-    selectedId: localStorage.getItem('selectedAccountId') || null,
+    list: [],
+    selectedId: null,
     editingId: null,
     editingName: '',
+    ui: { isLoading: false, error: '' },
   });
 
   const [transactionsState, setTransactionsState] = useState({
-    list: JSON.parse(localStorage.getItem('userTransactions') || '[]'),
-    isLoading: false,
+    list: [],
+    ui: { isLoading: false, error: '' },
   });
 
-  const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9FA8DA'];
+  const [percentages, setPercentages] = useState([]);
 
-  useEffect(() => {
-    if (budget.data.amount > 0) localStorage.setItem('userBudget', JSON.stringify(budget.data));
-  }, [budget.data]);
-
-  useEffect(() => {
-    if (accountsState.list.length > 0) localStorage.setItem('userAccounts', JSON.stringify(accountsState.list));
-  }, [accountsState.list]);
-
-  useEffect(() => {
-    if (accountsState.selectedId) localStorage.setItem('selectedAccountId', accountsState.selectedId);
-  }, [accountsState.selectedId]);
-
-  useEffect(() => {
-    if (transactionsState.list.length > 0) localStorage.setItem('userTransactions', JSON.stringify(transactionsState.list));
-  }, [transactionsState.list]);
-
-  const selectedAccount = useMemo(() => {
-    return accountsState.list.find(account => account.id === accountsState.selectedId);
-  }, [accountsState.list, accountsState.selectedId]);
-
-  const accountTransactions = useMemo(() => {
-    if (!accountsState.selectedId) return [];
-    return transactionsState.list.filter(t => t.accountId === accountsState.selectedId);
-  }, [transactionsState.list, accountsState.selectedId]);
-
-  const recentTransactions = useMemo(() => {
-    return accountTransactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-  }, [accountTransactions]);
-
-  const currentMonthExpenses = useMemo(() => {
+  // Computed values without useMemo
+  const selectedAccount = accountsState.list.find(account => account.id === accountsState.selectedId) || null;
+  
+  const accountTransactions = accountsState.selectedId 
+    ? transactionsState.list.filter(t => t.accountId === accountsState.selectedId)
+    : [];
+  
+  const recentTransactions = accountTransactions
+    .slice()
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
+  
+  const currentMonthExpenses = (() => {
     const now = new Date();
     return accountTransactions.filter(t => {
       const d = new Date(t.date);
-      return t.type === 'EXPENSE' && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      return t.type === 'EXPENSE' && 
+             d.getMonth() === now.getMonth() && 
+             d.getFullYear() === now.getFullYear();
     });
-  }, [accountTransactions]);
-
-  const expensesByCategory = useMemo(() => {
-    return currentMonthExpenses.reduce((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + t.amount;
-      return acc;
-    }, {});
-  }, [currentMonthExpenses]);
-
-  const pieChartData = useMemo(() => {
-    return Object.entries(expensesByCategory).map(([cat, val]) => ({ name: cat, value: val }));
-  }, [expensesByCategory]);
-
-  const percentUsed = useMemo(() => {
-    if (budget.data.amount === 0) return 0;
-    return (budget.data.spent / budget.data.amount) * 100;
-  }, [budget.data.spent, budget.data.amount]);
-
-  const getProgressColorClass = useCallback(() => {
+  })();
+  
+  const percentUsed = budget.data.amount === 0 ? 0 : (budget.data.spent / budget.data.amount) * 100;
+  
+  const getProgressColorClass = () => {
     if (percentUsed >= 90) return '[&>div]:bg-red-500';
     if (percentUsed >= 75) return '[&>div]:bg-yellow-500';
     return '[&>div]:bg-green-500';
-  }, [percentUsed]);
+  };
 
-  const fetchBudgetData = useCallback(async () => {
-    setBudget(prev => ({ ...prev, ui: { isLoading: true, error: '' } }));
+  // API Functions - without useCallback
+  const fetchAccounts = async () => {
+    setAccountsState(prev => ({ 
+      ...prev, 
+      ui: { isLoading: true, error: '' } 
+    }));
+    
     try {
-      const response = await axiosPrivate.get('/expense/budget/');
-      const results = response.data?.data?.results;
-      if (Array.isArray(results) && results.length > 0) {   
-        const budgetRes = results[0];
+      const response = await axiosPrivate.get('/expense/accounts/');
+      const accounts = response.data?.data?.results || [];
+    
+      const transformedAccounts = accounts.map(account => ({
+        id: account.id,
+        name: account.name,
+        type: account.type,
+        balance: parseFloat(account.balance) || 0,
+        isDefault: account.is_default, 
+      }));
+
+      const defaultAccount = transformedAccounts.find(acc => acc.isDefault);
+      const newSelectedId = defaultAccount?.id || transformedAccounts[0]?.id || null;
+      
+      setAccountsState(prev => ({ 
+        ...prev, 
+        list: transformedAccounts, 
+        selectedId: prev.selectedId || newSelectedId,
+        ui: { isLoading: false, error: '' }
+      }));
+      
+      return { success: true, data: transformedAccounts };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load accounts';
+      setAccountsState(prev => ({ 
+        ...prev, 
+        ui: { isLoading: false, error: errorMessage }
+      }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const addAccount = async (accountData) => {
+    try {
+      const response = await axiosPrivate.post('/expense/accounts/', {
+        name: accountData.name,
+        type: accountData.type || 'CURRENT',
+        balance: accountData.balance || 0
+      });
+      console.log(response.data);
+      const newAccountData = response.data?.data || response.data;
+      const newAccount = {
+        id: newAccountData.id,
+        name: newAccountData.name,
+        type: newAccountData.type,
+        balance: parseFloat(newAccountData.balance) || 0,
+        isDefault: newAccountData.is_default,
+        createdAt: newAccountData.created_at,
+        updatedAt: newAccountData.updated_at,
+      };
+      
+      setAccountsState(prev => ({ 
+        ...prev, 
+        list: [...prev.list, newAccount],
+        ui: { ...prev.ui, error: '' }
+      }));
+      
+      return { success: true, account: newAccount };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to add account';
+      setAccountsState(prev => ({ 
+        ...prev, 
+        ui: { ...prev.ui, error: errorMessage }
+      }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const updateAccount = async (accountId, updateData) => {
+    try {
+      const response = await axiosPrivate.put(`/expense/accounts/${accountId}/`, updateData);
+      
+      setAccountsState(prev => ({
+        ...prev,
+        list: prev.list.map(acc => 
+          acc.id === accountId 
+            ? { 
+                ...acc, 
+                ...updateData,
+                updatedAt: new Date().toISOString()
+              } 
+            : acc
+        ),
+        editingId: null,
+        editingName: '',
+        ui: { ...prev.ui, error: '' }
+      }));
+      
+      return { success: true, data: response.data };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update account';
+      setAccountsState(prev => ({ 
+        ...prev, 
+        ui: { ...prev.ui, error: errorMessage }
+      }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const deleteAccount = async (accountId) => {
+    try {
+      await axiosPrivate.delete(`/expense/accounts/${accountId}/`);
+      
+      setAccountsState(prev => {
+        const filtered = prev.list.filter(acc => acc.id !== accountId);
+        let newSelectedId = prev.selectedId;
+        
+        if (accountId === prev.selectedId) {
+          const defaultAccount = filtered.find(acc => acc.isDefault);
+          newSelectedId = defaultAccount?.id || filtered[0]?.id || null;
+        }
+        
+        return { 
+          ...prev, 
+          list: filtered, 
+          selectedId: newSelectedId,
+          ui: { ...prev.ui, error: '' }
+        };
+      });
+      
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete account';
+      setAccountsState(prev => ({ 
+        ...prev, 
+        ui: { ...prev.ui, error: errorMessage }
+      }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const handleAccountSelection = async (accountId) => {
+    try {
+      await axiosPrivate.put(`/expense/accounts/${accountId}/set-default/`, {
+        is_default: true
+      });
+      
+      setAccountsState(prev => ({
+        ...prev,
+        selectedId: accountId,
+        list: prev.list.map(acc => ({
+          ...acc,
+          isDefault: acc.id === accountId
+        }))
+      }));
+      
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to set default account';
+      setAccountsState(prev => ({ 
+        ...prev, 
+        ui: { ...prev.ui, error: errorMessage }
+      }));
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  // Account editing functions
+  const startEditingAccount = (accountId, name) => {
+    setAccountsState(prev => ({ 
+      ...prev, 
+      editingId: accountId, 
+      editingName: name || '' 
+    }));
+  };
+
+  const cancelEditingAccount = () => {
+    setAccountsState(prev => ({ 
+      ...prev, 
+      editingId: null, 
+      editingName: '' 
+    }));
+  };
+
+  const updateAccountEditingName = (name) => {
+    setAccountsState(prev => ({ 
+      ...prev, 
+      editingName: name 
+    }));
+  };
+
+  // Budget functions
+  const fetchBudgetData = async () => {
+    setBudget(prev => ({ ...prev, ui: { isLoading: true, error: '' } }));
+    
+    try {
+      const response = await axiosPrivate.get('/expense/budget/summary');
+      const result = response.data;
+      
+      if (response.data.success) {   
+        const budgetRes = result?.data?.result;
         const amount = parseFloat(budgetRes.amount) || 0;
         const spent = budgetRes.current_month_expenses || 0;
+        setPercentages(result?.data?.utilization?.category_breakdown);
+        
         setBudget({
           data: { id: budgetRes.id, amount, spent, exists: true },
           edit: { isEditing: false, newAmount: amount.toString(), isUpdating: false },
@@ -110,172 +275,180 @@ export const TrackerProvider = ({ children }) => {
           ui: { isLoading: false, error: '' },
         });
       } else {
-        setBudget(prev => ({ ...prev, data: { id: '', amount: 0, spent: 0, exists: false }, ui: { isLoading: false, error: '' } }));
+        setBudget(prev => ({ 
+          ...prev, 
+          data: { id: '', amount: 0, spent: 0, exists: false }, 
+          ui: { isLoading: false, error: '' } 
+        }));
       }
-    } catch (err) {
-      setBudget(prev => ({ ...prev, ui: { isLoading: false, error: 'Failed to load budget data' }, data: { id: '', amount: 0, spent: 0, exists: false } }));
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load budget data';
+      setBudget(prev => ({ 
+        ...prev, 
+        ui: { isLoading: false, error: errorMessage }, 
+        data: { id: '', amount: 0, spent: 0, exists: false } 
+      }));
     }
-  }, [axiosPrivate]);
+  };
 
-  const createBudget = useCallback(async (amount) => {
+  const createBudget = async (amount) => {
     const parsed = parseFloat(amount);
     if (isNaN(parsed) || parsed <= 0) {
-      setBudget(prev => ({ ...prev, ui: { ...prev.ui, error: 'Please enter a valid budget amount' } }));
-      setTimeout(() => setBudget(prev => ({ ...prev, ui: { ...prev.ui, error: '' } })), 3000);
-      return { success: false };
+      setBudget(prev => ({ ...prev, ui: { ...prev.ui, error: 'Please enter a valid amount greater than 0' } }));
+      return { success: false, error: 'Invalid amount' };
     }
-    setBudget(prev => ({ ...prev, create: { ...prev.create, isSubmitting: true }, ui: { ...prev.ui, error: '' } }));
+    
+    setBudget(prev => ({ 
+      ...prev, 
+      create: { ...prev.create, isSubmitting: true }, 
+      ui: { ...prev.ui, error: '' } 
+    }));
+    
     try {
       const response = await axiosPrivate.post('/expense/budget/', { amount: parsed });
-      if (response.data?.success) {
-        let newBudget;
-        if (response.data?.data?.results && Array.isArray(response.data.data.results)) {
-          newBudget = response.data.data.results[0];
-        } else if (response.data?.data) {
-          newBudget = response.data.data;
-        } else {
-          newBudget = response.data;
-        }
-        const budgetAmount = parseFloat(newBudget.amount) || 0;
-        const spent = newBudget.current_month_expenses || 0;
-        setBudget({
-          data: { id: newBudget.id, amount: budgetAmount, spent, exists: true },
-          edit: { isEditing: false, newAmount: budgetAmount.toString(), isUpdating: false },
-          create: { isCreating: false, createAmount: '', isSubmitting: false },
-          ui: { isLoading: false, error: '' },
-        });
-        return { success: true };
-      } else {
-        throw new Error(response.data?.message || 'Failed to create budget');
-      }
-    } catch (err) {
-      setBudget(prev => ({ ...prev, create: { ...prev.create, isSubmitting: false }, ui: { ...prev.ui, error: err.message || 'Failed to create budget' } }));
-      setTimeout(() => setBudget(prev => ({ ...prev, ui: { ...prev.ui, error: '' } })), 5000);
-      return { success: false };
+      const newBudget = response.data?.data?.results?.[0] || response.data?.data || response.data;
+      
+      setBudget({
+        data: { 
+          id: newBudget.id, 
+          amount: parseFloat(newBudget.amount) || 0, 
+          spent: newBudget.current_month_expenses || 0, 
+          exists: true 
+        },
+        edit: { isEditing: false, newAmount: newBudget.amount.toString(), isUpdating: false },
+        create: { isCreating: false, createAmount: '', isSubmitting: false },
+        ui: { isLoading: false, error: '' },
+      });
+      
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create budget';
+      setBudget(prev => ({ 
+        ...prev, 
+        create: { ...prev.create, isSubmitting: false }, 
+        ui: { ...prev.ui, error: errorMessage } 
+      }));
+      return { success: false, error: errorMessage };
     }
-  }, [axiosPrivate]);
+  };
 
-  const updateBudget = useCallback(async (newAmount) => {
-    const parsed = parseFloat(newAmount);
-    if (isNaN(parsed) || parsed < 0 || !budget.data.id) {
-      setBudget(prev => ({ ...prev, edit: { isEditing: false, newAmount: prev.data.amount.toString(), isUpdating: false } }));
-      return { success: false };
+  // Budget editing functions
+  const startEditingBudget = () => {
+    setBudget(prev => ({ 
+      ...prev, 
+      edit: { 
+        ...prev.edit, 
+        isEditing: true, 
+        newAmount: prev.data.amount.toString() 
+      },
+      ui: { ...prev.ui, error: '' }
+    }));
+  };
+
+  const cancelEditingBudget = () => {
+    setBudget(prev => ({ 
+      ...prev, 
+      edit: { 
+        ...prev.edit, 
+        isEditing: false, 
+        newAmount: prev.data.amount.toString(),
+        isUpdating: false
+      },
+      ui: { ...prev.ui, error: '' }
+    }));
+  };
+
+  const updateBudgetEditAmount = (amount) => {
+    setBudget(prev => ({ 
+      ...prev, 
+      edit: { ...prev.edit, newAmount: amount }
+    }));
+  };
+
+  const updateBudget = async (amount) => {
+    const parsed = parseFloat(amount);
+    if (isNaN(parsed) || parsed <= 0) {
+      setBudget(prev => ({ ...prev, ui: { ...prev.ui, error: 'Please enter a valid amount greater than 0' } }));
+      return { success: false, error: 'Invalid amount' };
     }
-    setBudget(prev => ({ ...prev, edit: { ...prev.edit, isUpdating: true } }));
+
+    setBudget(prev => ({ 
+      ...prev, 
+      edit: { ...prev.edit, isUpdating: true },
+      ui: { ...prev.ui, error: '' }
+    }));
+
     try {
       const response = await axiosPrivate.put(`/expense/budget/${budget.data.id}/`, { amount: parsed });
-      if (response.data?.success) {
-        setBudget(prev => ({ ...prev, data: { ...prev.data, amount: parsed }, edit: { isEditing: false, newAmount: parsed.toString(), isUpdating: false } }));
-        return { success: true };
-      } else {
-        throw new Error('Update failed');
-      }
-    } catch (err) {
-      setBudget(prev => ({ ...prev, edit: { isEditing: false, newAmount: prev.data.amount.toString(), isUpdating: false }, ui: { ...prev.ui, error: 'Failed to update budget' } }));
-      setTimeout(() => setBudget(prev => ({ ...prev, ui: { ...prev.ui, error: '' } })), 3000);
-      return { success: false };
-    }
-  }, [axiosPrivate, budget.data.id]);
-
-  const startEditingBudget = useCallback(() => {
-    setBudget(prev => ({ ...prev, edit: { isEditing: true, newAmount: prev.data.amount.toString(), isUpdating: false } }));
-  }, []);
-
-  const cancelEditingBudget = useCallback(() => {
-    setBudget(prev => ({ ...prev, edit: { isEditing: false, newAmount: prev.data.amount.toString(), isUpdating: false } }));
-  }, []);
-
-  const startCreatingBudget = useCallback(() => {
-    setBudget(prev => ({ ...prev, create: { isCreating: true, createAmount: '', isSubmitting: false }, ui: { ...prev.ui, error: '' } }));
-  }, []);
-
-  const cancelCreatingBudget = useCallback(() => {
-    setBudget(prev => ({ ...prev, create: { isCreating: false, createAmount: '', isSubmitting: false }, ui: { ...prev.ui, error: '' } }));
-  }, []);
-
-  const updateBudgetCreateAmount = useCallback((amount) => {
-    setBudget(prev => ({ ...prev, create: { ...prev.create, createAmount: amount } }));
-  }, []);
-
-  const updateBudgetEditAmount = useCallback((amount) => {
-    setBudget(prev => ({ ...prev, edit: { ...prev.edit, newAmount: amount } }));
-  }, []);
-
-  const handleAccountSelection = useCallback((id) => {
-    setAccountsState(prev => ({
-      ...prev,
-      selectedId: id,
-      list: prev.list.map(acc => ({ ...acc, isDefault: acc.id === id }))
-    }));
-  }, []);
-
-  const addAccount = useCallback(async (accountData) => {
-    try {
-      const response = await axiosPrivate.post('/expense/accounts/', accountData);
-
-      const newAccount = { ...response.data.account, isDefault: accountsState.list.length === 0 };
-      setAccountsState(prev => {
-        const newList = [...prev.list, newAccount];
-        return { ...prev, list: newList, selectedId: prev.selectedId || newAccount.id };
-      });
-      return { success: true, account: newAccount };
-    } catch (e) {
-      return { success: false, error: e.message };
-    }
-  }, [axiosPrivate, accountsState.list.length]);
-
-  const updateAccount = useCallback(async (accountId, updateData) => {
-    try {
-      const response = await axiosPrivate.put(`/expense/accounts/${accountId}/`, updateData);
-      setAccountsState(prev => ({
+      const updatedBudget = response.data?.data || response.data;
+      
+      setBudget(prev => ({
         ...prev,
-        list: prev.list.map(acc => acc.id === accountId ? { ...acc, ...updateData } : acc),
-        editingId: null,
-        editingName: ''
+        data: { 
+          ...prev.data, 
+          amount: parseFloat(updatedBudget.amount) || parsed 
+        },
+        edit: { 
+          isEditing: false, 
+          newAmount: (updatedBudget.amount || parsed).toString(), 
+          isUpdating: false 
+        },
+        ui: { ...prev.ui, error: '' }
       }));
-      return { success: true, data: response.data };
-    } catch (e) {
-      return { success: false, error: e.message };
-    }
-  }, [axiosPrivate]);
-
-  const deleteAccount = useCallback(async (accountId) => {
-    try {
-      await axiosPrivate.delete(`/expense/accounts/${accountId}/`);
-      setAccountsState(prev => {
-        const filtered = prev.list.filter(acc => acc.id !== accountId);
-        let newSelected = prev.selectedId;
-        if (accountId === prev.selectedId) {
-          newSelected = filtered.length > 0 ? filtered[0].id : null;
-        }
-        return { ...prev, list: filtered, selectedId: newSelected };
-      });
+      
       return { success: true };
-    } catch (e) {
-      return { success: false, error: e.message };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update budget';
+      setBudget(prev => ({ 
+        ...prev, 
+        edit: { ...prev.edit, isUpdating: false },
+        ui: { ...prev.ui, error: errorMessage }
+      }));
+      return { success: false, error: errorMessage };
     }
-  }, [axiosPrivate]);
+  };
 
-  const startEditingAccount = useCallback((accountId, name) => {
-    setAccountsState(prev => ({ ...prev, editingId: accountId, editingName: name }));
-  }, []);
+  // Budget creation functions
+  const startCreatingBudget = () => {
+    setBudget(prev => ({ 
+      ...prev, 
+      create: { ...prev.create, isCreating: true, createAmount: '' },
+      ui: { ...prev.ui, error: '' }
+    }));
+  };
 
-  const cancelEditingAccount = useCallback(() => {
-    setAccountsState(prev => ({ ...prev, editingId: null, editingName: '' }));
-  }, []);
+  const cancelCreatingBudget = () => {
+    setBudget(prev => ({ 
+      ...prev, 
+      create: { 
+        isCreating: false, 
+        createAmount: '', 
+        isSubmitting: false 
+      },
+      ui: { ...prev.ui, error: '' }
+    }));
+  };
 
-  const updateAccountEditingName = useCallback((name) => {
-    setAccountsState(prev => ({ ...prev, editingName: name }));
-  }, []);
+  const updateBudgetCreateAmount = (amount) => {
+    setBudget(prev => ({ 
+      ...prev, 
+      create: { ...prev.create, createAmount: amount }
+    }));
+  };
 
-  const fetchTransactions = useCallback(async () => {
-    setTransactionsState(prev => ({ ...prev, isLoading: true }));
+  // Transaction functions
+  const fetchTransactions = async () => {
+    setTransactionsState(prev => ({ 
+      ...prev, 
+      ui: { isLoading: true, error: '' } 
+    }));
+    
     try {
-      const resp = await axiosPrivate.get('/expense/transactions/');
-      const transactionsFromApi = (resp.data.data?.results || []).map(t => ({
+      const response = await axiosPrivate.get('/expense/transactions/');
+      const transactionsFromApi = (response.data.data?.results || []).map(t => ({
         id: t.id,
         type: t.type,
-        amount: parseFloat(t.amount),
+        amount: parseFloat(t.amount) || 0,
         description: t.description || '',
         date: t.date,
         category: t.category || '',
@@ -290,176 +463,63 @@ export const TrackerProvider = ({ children }) => {
         createdAt: t.created_at || '',
         updatedAt: t.updated_at || '',
       }));
-      setTransactionsState(prev => ({ ...prev, list: transactionsFromApi, isLoading: false }));
-      return { success: true, data: resp.data };
-    } catch (e) {
-      setTransactionsState(prev => ({ ...prev, isLoading: false }));
-      return { success: false, error: e.message };
-    }
-  }, [axiosPrivate]);
-
-  const addTransaction = useCallback(async (transaction) => {
-    try {
-      const payload = {
-        type: transaction.type,
-        amount: transaction.amount.toString(),
-        description: transaction.description,
-        date: transaction.date,
-        account: accountsState.selectedId,
-        category: transaction.category,
-      };
-      const resp = await axiosPrivate.post('/expense/transactions/', payload);
-      const apiTransaction = resp.data.data || resp.data.transaction || resp.data;
-      const newTransaction = {
-        id: apiTransaction.id,
-        type: apiTransaction.type,
-        amount: parseFloat(apiTransaction.amount),
-        description: apiTransaction.description || '',
-        date: apiTransaction.date,
-        category: apiTransaction.category || '',
-        receiptUrl: apiTransaction.receipt_url || null,
-        isRecurring: apiTransaction.is_recurring || false,
-        recurringInterval: apiTransaction.recurring_interval || null,
-        nextRecurringDate: apiTransaction.next_recurring_date || null,
-        status: apiTransaction.status || 'COMPLETED',
-        accountId: apiTransaction.account,
-        accountName: apiTransaction.account_name || '',
-        accountType: apiTransaction.account_type || '',
-        createdAt: apiTransaction.created_at || '',
-        updatedAt: apiTransaction.updated_at || '',
-      };
-      setTransactionsState(prev => ({ ...prev, list: [...prev.list, newTransaction] }));
-      setAccountsState(prev => ({
-        ...prev,
-        list: prev.list.map(acc => acc.id === newTransaction.accountId
-          ? { ...acc, balance: acc.balance + (newTransaction.type === 'INCOME' ? newTransaction.amount : -newTransaction.amount) }
-          : acc
-        )
+      
+      setTransactionsState(prev => ({ 
+        ...prev, 
+        list: transactionsFromApi, 
+        ui: { isLoading: false, error: '' } 
       }));
-      if (newTransaction.type === 'EXPENSE') {
-        setBudget(prev => ({ ...prev, data: { ...prev.data, spent: prev.data.spent + newTransaction.amount } }));
-      }
-      return { success: true, transaction: newTransaction };
-    } catch (e) {
-      return { success: false, error: e.message };
-    }
-  }, [axiosPrivate, accountsState.selectedId]);
-
-  const updateTransaction = useCallback(async (id, updateData) => {
-    try {
-      const payload = {
-        type: updateData.type,
-        amount: updateData.amount?.toString(),
-        description: updateData.description,
-        date: updateData.date,
-        account: updateData.accountId,
-        category: updateData.category,
-      };
-      const resp = await axiosPrivate.put(`/expense/transactions/${id}/`, payload);
-      const apiTransaction = resp.data.data || resp.data.transaction || resp.data;
-      const updatedTransaction = {
-        id: apiTransaction.id,
-        type: apiTransaction.type,
-        amount: parseFloat(apiTransaction.amount),
-        description: apiTransaction.description || '',
-        date: apiTransaction.date,
-        category: apiTransaction.category || '',
-        receiptUrl: apiTransaction.receipt_url || null,
-        isRecurring: apiTransaction.is_recurring || false,
-        recurringInterval: apiTransaction.recurring_interval || null,
-        nextRecurringDate: apiTransaction.next_recurring_date || null,
-        status: apiTransaction.status || 'COMPLETED',
-        accountId: apiTransaction.account,
-        accountName: apiTransaction.account_name || '',
-        accountType: apiTransaction.account_type || '',
-        createdAt: apiTransaction.created_at || '',
-        updatedAt: apiTransaction.updated_at || '',
-      };
-      setTransactionsState(prev => ({ ...prev, list: prev.list.map(t => t.id === id ? updatedTransaction : t) }));
-      return { success: true, data: updatedTransaction };
-    } catch (e) {
-      return { success: false, error: e.message };
-    }
-  }, [axiosPrivate]);
-
-  const deleteTransaction = useCallback(async (id) => {
-    try {
-      await axiosPrivate.delete(`/api/transactions/${id}/`);
-      const deleted = transactionsState.list.find(t => t.id === id);
-      if (!deleted) return { success: false, error: 'Transaction not found' };
-      setAccountsState(prev => ({
-        ...prev,
-        list: prev.list.map(acc => acc.id === deleted.accountId
-          ? { ...acc, balance: acc.balance + (deleted.type === 'INCOME' ? -deleted.amount : deleted.amount) }
-          : acc
-        )
+      
+      return { success: true, data: transactionsFromApi };
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load transactions';
+      setTransactionsState(prev => ({ 
+        ...prev, 
+        ui: { isLoading: false, error: errorMessage }
       }));
-      if (deleted.type === 'EXPENSE') {
-        setBudget(prev => ({ ...prev, data: { ...prev.data, spent: prev.data.spent - deleted.amount } }));
-      }
-      setTransactionsState(prev => ({ ...prev, list: prev.list.filter(t => t.id !== id) }));
-      return { success: true };
-    } catch (e) {
-      return { success: false, error: e.message };
+      return { success: false, error: errorMessage };
     }
-  }, [axiosPrivate, transactionsState.list]);
+  };
 
-  const fetchAccounts = useCallback(async () => {
-    try {
-      const resp = await axiosPrivate.get('/expense/accounts/');
-      const fetchedAccounts = resp.data.data?.results || [];
-      setAccountsState(prev => {
-        const newSelected = prev.selectedId || (fetchedAccounts.find(acc => acc.isDefault)?.id ?? (fetchedAccounts[0]?.id ?? null));
-        return { ...prev, list: fetchedAccounts, selectedId: newSelected };
-      });
-      return { success: true, data: resp.data.results };
-    } catch (e) {
-      return { success: false, error: e.message };
-    }
-  }, [axiosPrivate]);
+  const contextValue = {
+    // Budget
+    budget, 
+    percentUsed, 
+    getProgressColorClass, 
+    fetchBudgetData, 
+    createBudget,
+    startEditingBudget,
+    cancelEditingBudget,
+    updateBudgetEditAmount,
+    updateBudget,
+    startCreatingBudget,
+    cancelCreatingBudget,
+    updateBudgetCreateAmount,
+    
+    // Accounts
+    accountsState, 
+    selectedAccount,
+    handleAccountSelection, 
+    addAccount, 
+    fetchAccounts,
+    updateAccount, 
+    deleteAccount, 
+    startEditingAccount,
+    cancelEditingAccount, 
+    updateAccountEditingName,
+    
+    // Transactions
+    transactionsState, 
+    fetchTransactions,
+    accountTransactions,
+    recentTransactions, 
+    currentMonthExpenses, 
+    percentages,
+  };
 
-  useEffect(() => {
-    const initialize = async () => {
-      await Promise.all([fetchAccounts(), fetchBudgetData(), fetchTransactions()]);
-    };
-    initialize();
-  }, [fetchAccounts, fetchBudgetData, fetchTransactions]);
-
-  const formatDate = useCallback((dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }, []);
-
-  const clearAllData = useCallback(() => {
-    setBudget({
-      data: { id: '', amount: 0, spent: 0, exists: false },
-      edit: { isEditing: false, newAmount: '0', isUpdating: false },
-      create: { isCreating: false, createAmount: '', isSubmitting: false },
-      ui: { isLoading: true, error: '' },
-    });
-    setAccountsState({ list: [], selectedId: null, editingId: null, editingName: '' });
-    setTransactionsState({ list: [], isLoading: false });
-    ['userBudget', 'userAccounts', 'userTransactions', 'selectedAccountId'].forEach(key => localStorage.removeItem(key));
-  }, []);
-
-  const value = useMemo(() => ({
-    budget, percentUsed, getProgressColorClass, fetchBudgetData, createBudget, updateBudget,
-    startEditingBudget, cancelEditingBudget, startCreatingBudget, cancelCreatingBudget,
-    updateBudgetCreateAmount, updateBudgetEditAmount, accountsState, selectedAccount,
-    handleAccountSelection, addAccount, updateAccount, deleteAccount, startEditingAccount,
-    cancelEditingAccount, updateAccountEditingName, transactionsState, addTransaction,
-    updateTransaction, deleteTransaction, fetchTransactions, accountTransactions,
-    recentTransactions, currentMonthExpenses, expensesByCategory, pieChartData, COLORS,
-    formatDate, clearAllData,
-  }), [
-    budget, percentUsed, getProgressColorClass, accountsState, selectedAccount, transactionsState,
-    accountTransactions, recentTransactions, currentMonthExpenses, expensesByCategory, pieChartData,
-    fetchBudgetData, createBudget, updateBudget, startEditingBudget, cancelEditingBudget,
-    startCreatingBudget, cancelCreatingBudget, updateBudgetCreateAmount, updateBudgetEditAmount,
-    handleAccountSelection, addAccount, updateAccount, deleteAccount, startEditingAccount,
-    cancelEditingAccount, updateAccountEditingName, addTransaction, updateTransaction,
-    deleteTransaction, fetchTransactions, formatDate, clearAllData,
-  ]);
-
-  return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;
+  return (
+    <TrackerContext.Provider value={contextValue}>
+      {children}
+    </TrackerContext.Provider>
+  );
 };

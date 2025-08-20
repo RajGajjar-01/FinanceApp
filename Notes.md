@@ -46,7 +46,7 @@ terminal> celery -A backend worker --loglevel=info
 - **Stop services**
 `docker-compose down`
 
-python manage.py runscript 
+python manage.py runscript filename   .py nai
 
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519

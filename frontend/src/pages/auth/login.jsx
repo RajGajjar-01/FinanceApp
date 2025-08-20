@@ -73,8 +73,6 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     const response = await login(data);
-    console.log(document.cookie);
-    console.log(response);
     if (response.data?.errors?.non_field_errors)
       form.setError('root', {
         message: 'Invalid credentials',

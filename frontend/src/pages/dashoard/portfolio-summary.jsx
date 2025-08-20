@@ -7,14 +7,14 @@ import { portfolioSummary } from './PortfoliodummyData';
 const PortfolioSummary = () => {
   return (
       <Card className="bg-primary/7 p-5 max-w-md">
-        <p className="text-sm text-gray-400 uppercase tracking-wide">Current Value</p>
+        <p className="text-sm uppercase tracking-wide">Current Value</p>
         <Card className="bg-primary/7 p-4 ">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <p className="text-3xl font-semibold text-white">
+              <p className="text-3xl font-semibold">
                 ${portfolioSummary.currentValue.toFixed(2)}
               </p>
-              <p className="text-sm text-green-400 font-medium">
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
                 {portfolioSummary.dailyChange >= 0 ? '+' : ''}
                 {portfolioSummary.dailyChange.toFixed(2)} (
                 {portfolioSummary.dailyChangePercent >= 0 ? '+' : ''}
@@ -25,7 +25,7 @@ const PortfolioSummary = () => {
             <Button
               variant="outline"
               size="sm"
-              className="bg-transparent mt-3 rounded-2xl border-gray-600 text-light hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all duration-200"
+              className="bg-transparent mt-3 rounded-2xl border-gray-600 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all duration-200"
             >
               See Details
             </Button>
@@ -35,15 +35,15 @@ const PortfolioSummary = () => {
         {/* Invested Value Section - Outside the sub-card */}
         <div className="flex justify-between items-center">
           <div className="space-y-1">
-            <p className="text-sm text-gray-400 uppercase tracking-wide">Invested Value</p>
-            <p className="text-xl font-semibold text-white">
+            <p className="text-sm uppercase tracking-wide">Invested Value</p>
+            <p className="text-xl font-semibold">
               ${portfolioSummary.investedValue.toFixed(2)}
             </p>
           </div>
 
           {/* Returns displayed on right side of invested value */}
           <div className="text-right">
-            <p className="text-sm text-green-400 font-medium">
+            <p className="text-md text-green-600 dark:text-green-400 font-medium">
               {portfolioSummary.investedChange >= 0 ? '+' : ''}
               {portfolioSummary.investedChange.toFixed(2)} (
               {portfolioSummary.investedChangePercent >= 0 ? '+' : ''}

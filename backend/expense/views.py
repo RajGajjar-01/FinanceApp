@@ -1,11 +1,12 @@
 import calendar
 from decimal import Decimal
 from django.db import transaction
-from django.db.models import Q, Sum, Count
+from django.db.models.functions import Cast
+from django.db.models import Q, Sum, Count, Prefetch, When, FloatField, ExpressionWrapper, F, Case
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, viewsets, filters
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework.exceptions import ValidationError, NotFound
 from backend.utils import create_success_response, create_error_response
 from .models import Account, Transaction, Budget, AccountType, TransactionStatus, TransactionType, RecurringInterval
@@ -213,7 +214,7 @@ class AccountViewSet(viewsets.ModelViewSet):
                 errors=[_("An error occurred. Please try again.")]
             )
 
-    @action(detail=True, methods=['patch'], url_path='set-default')
+    @action(detail=True, methods=['put'], url_path='set-default')
     def set_default(self, request, id=None):
         try:
             account = self.get_object()
@@ -696,7 +697,28 @@ class BudgetViewSet(viewsets.ModelViewSet):
             days_remaining = days_in_month - days_elapsed + 1
             average_daily_spending = (current_expenses / days_elapsed if days_elapsed > 0 else Decimal('0.00'))
             projected_spending = average_daily_spending * days_in_month
-            category_breakdown = list(transactions_qs.values('category').annotate(total=Sum('amount')).order_by('-total')[:10])
+        
+            
+            category_breakdown_per = list(
+                transactions_qs.values('category')
+                .annotate(total=Sum('amount'))
+                .annotate(
+                    percentage=Case(
+                        When(total__gt=0, then=Cast(F('total') * 100.0 / current_expenses, FloatField())),
+                        default=0.0,
+                        output_field=FloatField()
+                    ) if current_expenses > 0 else ExpressionWrapper(
+                        F('total') * 0,  # This will always be 0
+                        output_field=FloatField()
+                    )
+                )
+                .values('category', 'total', 'percentage')
+                .order_by('-total')
+            )
+
+            # Round the percentages to 2 decimal places
+            for item in category_breakdown_per:
+                item['percentage'] = round(item['percentage'], 2) if current_expenses > 0 else 0.0
 
             recommendations = []
             if utilization_percentage >= 100:
@@ -708,17 +730,22 @@ class BudgetViewSet(viewsets.ModelViewSet):
             else:
                 recommendations.append({'type': 'success', 'message': _("Great job staying within budget!")})
 
+            # CHANGED: Updated summary_data structure to include both formats
             summary_data = {
-                'budget_info': {
+                # NEW: Added results array with budget info in the same format as list/retrieve
+                'result': {
                     'id': str(budget.id),
-                    'amount': budget.amount,
+                    'amount': str(budget.amount),  # Convert to string to match your expected format
+                    'current_month_expenses': float(current_expenses),
+                    'budget_utilization_percentage': int(round(utilization_percentage)),  # Convert to int to match your format
+                    'last_alert_sent': budget.last_alert_sent,
                     'created_at': budget.created_at,
-                    'last_alert_sent': budget.last_alert_sent
+                    'updated_at': budget.updated_at
                 },
                 'utilization': {
                     'current_month_expenses': current_expenses,
                     'utilization_percentage': round(utilization_percentage, 2),
-                    'category_breakdown': category_breakdown,
+                    'category_breakdown': category_breakdown_per,
                     'average_daily_spending': average_daily_spending,
                     'projected_monthly_spending': projected_spending,
                     'days_remaining_in_month': days_remaining,
@@ -744,3 +771,81 @@ class BudgetViewSet(viewsets.ModelViewSet):
                 _("Failed to retrieve budget summary."),
                 errors=[str(e)]
             )
+            
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from django.conf import settings
+from PIL import Image
+import tempfile
+import os
+from .services.api_service import scan_receipt_with_groq
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def scan_receipt(request):
+    """Scan receipt and extract expense data"""
+    # Validate image file
+    if 'image' not in request.FILES:
+        return create_error_response("No image provided", status.HTTP_400_BAD_REQUEST)
+    
+    image_file = request.FILES['image']
+    print(image_file)
+    
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'application/octet-stream']
+    if image_file.content_type not in allowed_types:
+        return create_error_response("Invalid file type", status.HTTP_400_BAD_REQUEST)
+    
+    if image_file.size > 10 * 1024 * 1024:  
+        return create_error_response("File too large. Max 10MB", status.HTTP_400_BAD_REQUEST)
+
+    try:
+        img = Image.open(image_file)
+        img.verify()
+        image_file.seek(0)
+    except:
+        return create_error_response("Invalid image file", status.HTTP_400_BAD_REQUEST)
+    
+    temp_file_path = None
+    try:
+        # Create temp file
+        temp_dir = tempfile.mkdtemp()
+        file_ext = os.path.splitext(image_file.name)[1] or '.jpg'
+        temp_file_path = os.path.join(temp_dir, f"receipt{file_ext}")
+        
+        with open(temp_file_path, 'wb') as f:
+            for chunk in image_file.chunks():
+                f.write(chunk)
+        api_key='enter here'
+        if not api_key:
+            return create_error_response("Service unavailable", status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        # Scan receipt
+        scanned_data, error = scan_receipt_with_groq(temp_file_path, api_key)
+        
+        if error:
+            return create_error_response("Failed to process receipt", status.HTTP_422_UNPROCESSABLE_ENTITY)
+        
+        formatted_data = {
+            "amount": str(scanned_data.get('amount', '0.00')),
+            "description": scanned_data.get('description', 'Receipt Purchase'),
+            "category": scanned_data.get('category', 'OTHER'),
+            "date": scanned_data.get('date'),
+            "vendor": scanned_data.get('vendor', 'Unknown'),
+            "currency": scanned_data.get('currency', '$'),
+            "type": "EXPENSE"
+        }
+        
+        return create_success_response("Receipt scanned successfully", formatted_data)
+        
+    except Exception as e:
+        return create_error_response("Processing failed", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    finally:
+        # Cleanup temp file
+        if temp_file_path and os.path.exists(temp_file_path):
+            try:
+                os.remove(temp_file_path)
+                os.rmdir(os.path.dirname(temp_file_path))
+            except:
+                pass

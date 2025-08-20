@@ -3,18 +3,19 @@ import { Routes, Route } from 'react-router';
 import Landing from '@/pages/landing/landing_page';
 import Register from '@/pages/auth/register';
 import Login from '@/pages/auth/login';
-import Dashboard2 from '@/pages/dashoard/dashboard-page';
+import Dashboard from '@/pages/dashoard/dashboard-page';
 
 const Profile = lazy(() => import('../pages/auth/profile_page'));
 const OTPVerification = lazy(() => import('@/pages/auth/register-redirect'));
-const Dashboard = lazy(() => import('@/pages/dashoard/dashboard-page'));
 const Tracker = lazy(() => import('@/pages/tracker/tracker-page'));
 const Portfolio = lazy(() => import('@/pages/portfolio/portfolio-page'));
+const AllTransaction = lazy(() => import('@/pages/all-transactions/all-transaction'));
 
 import ProtectedRoute from './ProtectedRoute';
 
 import { Suspense } from 'react';
 import PageLoader from '../components/page-loader';
+import AddTransactionForm from '@/pages/all-transactions/add-transaction-form';
 
 function Routing() {
   return (
@@ -25,8 +26,6 @@ function Routing() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<OTPVerification />} />
-          <Route path="/maindash" element={<Dashboard2 />} />
-
           <Route
             path="/dashboard"
             element={
@@ -56,6 +55,22 @@ function Routing() {
             element={
               <ProtectedRoute>
                 <Portfolio />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <AllTransaction />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/add-transaction"
+            element={
+              <ProtectedRoute>
+                <AddTransactionForm />
               </ProtectedRoute>
             }
           />

@@ -7,26 +7,84 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 from django.core.exceptions import ValidationError
 
+
 User = get_user_model()
+
 
 class AccountType(models.TextChoices):
     CURRENT = 'CURRENT', 'Current Account'
     SAVINGS = 'SAVINGS', 'Savings Account'
 
+
 class TransactionType(models.TextChoices):
     INCOME = 'INCOME', 'Income'
     EXPENSE = 'EXPENSE', 'Expense'
+
 
 class TransactionStatus(models.TextChoices):
     PENDING = 'PENDING', 'Pending'
     COMPLETED = 'COMPLETED', 'Completed'
     FAILED = 'FAILED', 'Failed'
 
+
 class RecurringInterval(models.TextChoices):
     DAILY = 'DAILY', 'Daily'
     WEEKLY = 'WEEKLY', 'Weekly'
     MONTHLY = 'MONTHLY', 'Monthly'
     YEARLY = 'YEARLY', 'Yearly'
+
+
+class TransactionCategory(models.TextChoices):
+    # Income Categories
+    SALARY = 'SALARY', 'Salary'
+    BUSINESS = 'BUSINESS', 'Business Income'
+    INVESTMENT = 'INVESTMENT', 'Investment Returns'
+    FREELANCE = 'FREELANCE', 'Freelance/Consulting'
+    RENTAL = 'RENTAL', 'Rental Income'
+    BONUS = 'BONUS', 'Bonus/Commission'
+    REFUND = 'REFUND', 'Refunds'
+    GIFT = 'GIFT', 'Gifts Received'
+    
+    # Essential Expenses
+    FOOD = 'FOOD', 'Food & Dining'
+    GROCERIES = 'GROCERIES', 'Groceries'
+    TRANSPORT = 'TRANSPORT', 'Transportation'
+    FUEL = 'FUEL', 'Fuel/Gas'
+    BILLS = 'BILLS', 'Bills & Utilities'
+    RENT = 'RENT', 'Rent/Mortgage'
+    INSURANCE = 'INSURANCE', 'Insurance'
+    HEALTHCARE = 'HEALTHCARE', 'Healthcare'
+    
+    # Lifestyle & Personal
+    SHOPPING = 'SHOPPING', 'Shopping'
+    CLOTHING = 'CLOTHING', 'Clothing & Accessories'
+    ENTERTAINMENT = 'ENTERTAINMENT', 'Entertainment'
+    EDUCATION = 'EDUCATION', 'Education'
+    TRAVEL = 'TRAVEL', 'Travel'
+    FITNESS = 'FITNESS', 'Fitness & Sports'
+    PERSONAL_CARE = 'PERSONAL_CARE', 'Personal Care'
+    SUBSCRIPTIONS = 'SUBSCRIPTIONS', 'Subscriptions'
+    
+    # Financial
+    SAVINGS = 'SAVINGS', 'Savings'
+    INVESTMENTS = 'INVESTMENTS', 'Investments'
+    LOAN_PAYMENT = 'LOAN_PAYMENT', 'Loan Payments'
+    CREDIT_CARD = 'CREDIT_CARD', 'Credit Card Payment'
+    BANK_FEES = 'BANK_FEES', 'Bank Fees'
+    TAXES = 'TAXES', 'Taxes'
+    
+    # Family & Social
+    CHILDCARE = 'CHILDCARE', 'Childcare'
+    PET_CARE = 'PET_CARE', 'Pet Care'
+    CHARITY = 'CHARITY', 'Charity/Donations'
+    GIFTS_GIVEN = 'GIFTS_GIVEN', 'Gifts Given'
+    
+    # Home & Maintenance
+    HOME_IMPROVEMENT = 'HOME_IMPROVEMENT', 'Home Improvement'
+    MAINTENANCE = 'MAINTENANCE', 'Maintenance & Repairs'
+    
+    OTHER = 'OTHER', 'Other'
+
 
 class TimeStampedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -35,6 +93,7 @@ class TimeStampedModel(models.Model):
     
     class Meta:
         abstract = True
+
 
 class Account(TimeStampedModel):
     name = models.CharField(max_length=100, db_index=True)
@@ -76,6 +135,7 @@ class Account(TimeStampedModel):
             Account.objects.filter(user=self.user, is_default=True).update(is_default=False)
         super().save(*args, **kwargs)
 
+
 class Transaction(TimeStampedModel):
     type = models.CharField(
         max_length=10,
@@ -89,7 +149,13 @@ class Transaction(TimeStampedModel):
     )
     description = models.CharField(max_length=500, blank=True, null=True)
     date = models.DateTimeField(db_index=True)
-    category = models.CharField(max_length=100, db_index=True)
+    # CHANGED: Updated category field to use TransactionCategory choices and increased max_length
+    category = models.CharField(
+        max_length=20,  # Changed from 100 to 20 to fit the choice values
+        choices=TransactionCategory.choices,
+        default=TransactionCategory.OTHER,  # Added default value
+        db_index=True
+    )
     receipt_url = models.URLField(blank=True, null=True)
     
     is_recurring = models.BooleanField(default=False, db_index=True)
@@ -161,7 +227,8 @@ class Transaction(TimeStampedModel):
                     raise ValidationError("Insufficient funds in savings account")
                 account.balance -= self.amount
             
-            account.save(update_fields=['balance', 'updated_at', 'is_default'])
+            account.save(update_fields=['balance', 'updated_at'])  # CHANGED: Removed 'is_default' from update_fields
+
 
 class Budget(TimeStampedModel):
     amount = models.DecimalField(

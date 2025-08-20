@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AccountViewSet, TransactionViewSet, BudgetViewSet
+from .views import AccountViewSet, TransactionViewSet, BudgetViewSet,scan_receipt
 
 app_name = 'expense'
 
@@ -11,5 +11,6 @@ router.register(r'budget', BudgetViewSet, basename='budget')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('scan/', scan_receipt, name='scan-receipt'),
 ]
 
