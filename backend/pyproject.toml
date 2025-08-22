@@ -12,6 +12,7 @@ dependencies = [
     "django-extensions>=4.1",
     "djangorestframework>=3.16.0",
     "djangorestframework-simplejwt>=5.5.0",
+    "drf-spectacular>=0.28.0",
     "groq>=0.31.0",
     "isort>=6.0.1",
     "pillow>=11.3.0",
