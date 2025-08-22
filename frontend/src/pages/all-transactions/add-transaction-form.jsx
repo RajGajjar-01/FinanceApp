@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { CalendarIcon, Loader2, Camera, X, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import TransactionNavbar from './transaction-navbar';
+import Navbar from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -140,14 +140,11 @@ const AddTransactionForm = () => {
         ...data,
       });
 
-      console.log(data);
 
-      console.log('Transaction created:', response.data);
       reset();
       navigate('/transactions');
     } catch (error) {
-      console.error('Error creating transaction:', error);
-     
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -194,7 +191,7 @@ const AddTransactionForm = () => {
       if (response.data.success) {
         const scannedData = response.data.data;
 
-        console.log(scannedData);
+
         
         // Populate form with scanned data
         setValue('amount', scannedData.amount);
@@ -203,7 +200,7 @@ const AddTransactionForm = () => {
         setValue('date', new Date(scannedData.date));
         setValue('type', scannedData.type);
 
-        console.log('Receipt scanned successfully:', scannedData);
+
         
         // Clear image after successful scan
         setSelectedImage(null);
@@ -215,7 +212,7 @@ const AddTransactionForm = () => {
         throw new Error(response.data.message || 'Failed to scan receipt');
       }
     } catch (error) {
-      console.error('Error scanning receipt:', error);
+
       setScanError(
         error.response?.data?.error || 
         error.message || 
@@ -252,7 +249,7 @@ const AddTransactionForm = () => {
 
   return (
     <>
-      <TransactionNavbar />
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <Card>

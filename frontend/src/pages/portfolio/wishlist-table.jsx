@@ -75,7 +75,7 @@ const WishlistTable = () => {
   return (
     <Card className="bg-card">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Watchlist</CardTitle>
+        <CardTitle className="text-lg text-card-foreground">Watchlist</CardTitle>
         <CardDescription>Stocks you're monitoring</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
@@ -83,34 +83,34 @@ const WishlistTable = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[80px]">Symbol</TableHead>
-                <TableHead className="min-w-[120px]">Company</TableHead>
-                <TableHead className="text-right">Target</TableHead>
-                <TableHead className="text-right">Current</TableHead>
-                <TableHead className="text-right">Distance</TableHead>
-                <TableHead className="text-center">Priority</TableHead>
+                <TableHead className="w-[80px] text-muted-foreground">Symbol</TableHead>
+                <TableHead className="min-w-[120px] text-muted-foreground">Company</TableHead>
+                <TableHead className="text-right text-muted-foreground">Target</TableHead>
+                <TableHead className="text-right text-muted-foreground">Current</TableHead>
+                <TableHead className="text-right text-muted-foreground">Distance</TableHead>
+                <TableHead className="text-center text-muted-foreground">Priority</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {wishlistData.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
                     <div>
-                      <div className="font-semibold">{item.symbol}</div>
+                      <div className="font-semibold text-card-foreground">{item.symbol}</div>
                       <Badge variant="secondary" className="text-xs mt-1">
                         {item.sector}
                       </Badge>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-[120px]">
-                    <div className="truncate" title={item.name}>
+                    <div className="truncate text-card-foreground" title={item.name}>
                       {item.name}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-medium">
+                  <TableCell className="text-right font-medium text-card-foreground">
                     ${item.targetPrice.toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right text-card-foreground">
                     ${item.currentPrice.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
@@ -136,7 +136,7 @@ const WishlistTable = () => {
         </div>
         
         {/* Summary Footer */}
-        <div className="border-t border-border p-3 bg-muted/30">
+        <div className="border-t border-border p-4 bg-muted/30">
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground">
               {wishlistData.length} watchlist items

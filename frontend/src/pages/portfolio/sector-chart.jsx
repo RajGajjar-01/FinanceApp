@@ -26,7 +26,7 @@ const ALL_SECTORS = [
 const chartConfig = {
   value: {
     label: 'Allocation %',
-    color: 'oklch(79.2% 0.209 151.711)',
+    color: 'rgb(74 222 128)',
   },
 };
 
@@ -34,7 +34,7 @@ const ErrorState = ({ error }) => {
   const isNetworkError = error.toLowerCase().includes('network');
   
   return (
-    <div className="h-80 flex flex-col items-center justify-center text-center space-y-4">
+    <div className="h-64 flex flex-col items-center justify-center text-center space-y-4">
       {isNetworkError ? (
         <WifiOff className="h-12 w-12 text-red-500" />
       ) : (
@@ -124,11 +124,11 @@ function SectorBarChart() {
     return (
       <Card className="bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Portfolio by Sector</CardTitle>
+          <CardTitle className="text-lg text-card-foreground">Portfolio by Sector</CardTitle>
           <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-40">
+          <div className="flex items-center justify-center h-64">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         </CardContent>
@@ -140,7 +140,7 @@ function SectorBarChart() {
     return (
       <Card className="bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Portfolio by Sector</CardTitle>
+          <CardTitle className="text-lg text-card-foreground">Portfolio by Sector</CardTitle>
           <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
         </CardHeader>
         <CardContent>
@@ -153,19 +153,19 @@ function SectorBarChart() {
   return (
     <Card className="bg-card">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Portfolio by Sector</CardTitle>
+        <CardTitle className="text-lg text-card-foreground">Portfolio by Sector</CardTitle>
         <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
       </CardHeader>
       
       <CardContent>
         {data.length === 0 && (
-          <div className="h-40 flex items-center justify-center text-muted-foreground">
+          <div className="h-64 flex items-center justify-center text-muted-foreground">
             <p>No sector data available</p>
           </div>
         )}
         
         {data.length > 0 && (
-          <ChartContainer config={chartConfig} className="h-40">
+          <ChartContainer config={chartConfig} className="h-64">
             <BarChart
               accessibilityLayer
               data={data}

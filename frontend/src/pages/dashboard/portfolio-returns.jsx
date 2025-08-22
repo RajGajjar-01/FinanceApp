@@ -100,14 +100,14 @@ const PortfolioReturn = () => {
                 <defs>
                   {/* Area fill - Solid color instead of gradient */}
                   <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                    <stop offset="0%" stopColor="rgb(74 222 128)" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="rgb(74 222 128)" stopOpacity={0.05} />
                   </linearGradient>
                   
                   {/* Line stroke - Solid color instead of gradient */}
                   <linearGradient id="lineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={1} />
+                    <stop offset="0%" stopColor="rgb(74 222 128)" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="rgb(74 222 128)" stopOpacity={1} />
                   </linearGradient>
                 </defs>
                 
@@ -150,10 +150,10 @@ const PortfolioReturn = () => {
                   fillOpacity={1}
                   activeDot={{ 
                     r: 5, 
-                    stroke: "hsl(var(--primary))", 
+                    stroke: "rgb(74 222 128)", 
                     strokeWidth: 3, 
-                    fill: "hsl(var(--primary))",
-                    filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.3))'
+                    fill: "rgb(74 222 128)",
+                    filter: 'drop-shadow(0 0 8px rgb(74 222 128) / 0.3)'
                   }}
                 />
               </AreaChart>

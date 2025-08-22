@@ -49,7 +49,7 @@ const Register = () => {
   const [searchParams] = useSearchParams();
   const code = searchParams.get('code');
   const error = searchParams.get('error');
-  console.log('remder');
+
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -66,13 +66,13 @@ const Register = () => {
       handleGoogleCallback(code, 'from:register');
     }
     if (error) {
-      console.error('OAuth error:', error);
+      setGoogleLoading(false);
     }
   }, [code, error]);
 
   const onSubmit = async (data) => {
     const response = await register(data);
-    console.log(response.data);
+
     if (response.data.errors?.username) {
       form.setError('username', {
         message: 'Username already taken',

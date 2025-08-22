@@ -6,9 +6,9 @@ import { portfolioSummary } from './PortfoliodummyData';
 
 const PortfolioSummary = () => {
   return (
-      <Card className="bg-card p-3 max-w-md">
-        <p className="text-sm uppercase tracking-wide text-muted-foreground">Current Value</p>
-        <Card className="bg-card p-3">
+      <Card className="bg-card p-3 h-[280px] flex flex-col">
+        <p className="text-sm uppercase tracking-wide text-muted-foreground mb-2">Current Value</p>
+        <Card className="bg-card p-3 flex-1">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <p className="text-3xl font-semibold text-card-foreground">
@@ -32,8 +32,7 @@ const PortfolioSummary = () => {
           </div>
         </Card>
 
-        {/* Invested Value Section - Outside the sub-card */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-3">
           <div className="space-y-1">
             <p className="text-sm uppercase tracking-wide text-muted-foreground">Invested Value</p>
             <p className="text-xl font-semibold text-card-foreground">

@@ -14,7 +14,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  console.log('render');
+
   const [user, setUser] = useState(()=>{
     const stored = localStorage.getItem('userData');
     return stored ? JSON.parse(stored) : null;
@@ -78,6 +78,18 @@ export const AuthProvider = ({ children }) => {
       if (tokenCookie) {
         const token = tokenCookie.split('=')[1];
         setAuthToken(token);
+        
+        // Also check if we have user data in localStorage
+        const storedUser = localStorage.getItem('userData');
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
+          } catch (error) {
+            console.error('Error parsing stored user data:', error);
+            localStorage.removeItem('userData');
+          }
+        }
       }
     };
 
@@ -87,6 +99,9 @@ export const AuthProvider = ({ children }) => {
   const clearAuthData = useCallback(() => {
     setUser(null);
     setAuthToken(null);
+    localStorage.removeItem('userData');
+    // Clear cookies
+    document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   }, []);
 
   const setAuthData = useCallback((response) => {
@@ -206,6 +221,7 @@ export const AuthProvider = ({ children }) => {
     handleGoogleCallback,
     resendVerifyEmail,
     axiosPrivate,
+    setAuthData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
