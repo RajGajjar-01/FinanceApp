@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
-
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from user import views as user_views
 
 urlpatterns = [
@@ -29,4 +29,7 @@ urlpatterns = [
     path('auth/google/callback/', user_views.google_auth_callback, name='google_auth_callback'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', user_views.token_refresh_view, name='token_refresh'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

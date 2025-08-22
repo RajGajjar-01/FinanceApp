@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router';
 import Landing from '@/pages/landing/landing_page';
 import Register from '@/pages/auth/register';
 import Login from '@/pages/auth/login';
-import Dashboard from '@/pages/dashoard/dashboard-page';
+import Dashboard from '@/pages/dashboard/dashboard-page';
 
 const Profile = lazy(() => import('../pages/auth/profile_page'));
 const OTPVerification = lazy(() => import('@/pages/auth/register-redirect'));

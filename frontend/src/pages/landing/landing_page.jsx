@@ -1,4 +1,4 @@
-import Header from '@/components/header';
+import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import React, { useState } from 'react';
 import heroImage from '@/assets/dashboardImage.jpg';
@@ -137,7 +137,7 @@ const Landing = () => {
 
   return (
     <>
-      <Header />
+      <Navbar />
       <div className="min-h-screen overflow-hidden">
         {/* Hero Section - Fixed: Added better large screen responsiveness */}
         <section className="relative min-h-screen flex items-center justify-center py-20">

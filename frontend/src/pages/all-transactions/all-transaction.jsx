@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import TransactionNavbar from './transaction-navbar';
+import Navbar from '@/components/navbar';
 import { useLocation } from 'react-router';
 import { useTracker } from '@/contexts/tracker-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -133,7 +133,7 @@ const AllTransaction = () => {
         setLoading(true);
         setError(null);
         const response = await fetchTransactions();
-        console.log();
+
         setTransactions(response.data || []);
       } catch (err) {
         setError(err.message || 'Failed to fetch transactions');
@@ -263,11 +263,11 @@ const AllTransaction = () => {
   };
 
   const handleEdit = (transaction) => {
-    console.log('Edit transaction:', transaction);
+    // TODO: Implement edit functionality
   };
 
   const handleDelete = (transaction) => {
-    console.log('Delete transaction:', transaction);
+    // TODO: Implement delete functionality
   };
 
   const getTransactionType = (transaction) => {
@@ -289,7 +289,7 @@ const AllTransaction = () => {
   if (loading) {
     return (
       <>
-        <TransactionNavbar />
+        <Navbar />
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -305,7 +305,7 @@ const AllTransaction = () => {
   if (error) {
     return (
       <>
-        <TransactionNavbar />
+        <Navbar />
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -319,7 +319,7 @@ const AllTransaction = () => {
 
   return (
     <>
-      <TransactionNavbar />
+      <Navbar />
 
       <div className="container mx-auto px-4 py-6">
         <>

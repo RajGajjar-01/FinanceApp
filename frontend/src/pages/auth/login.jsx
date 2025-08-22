@@ -35,7 +35,7 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const code = searchParams.get('code');
   const error = searchParams.get('error');
-  console.log('rendeer');
+
 
   const form = useForm({
     resolver: zodResolver(formSchema),

@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import {
   AreaChart,
@@ -18,19 +18,19 @@ import {
 } from './PortfoliodummyData';
 
 // Time period button component
-const TimePeriodButton = memo(({ period, isSelected, onClick }) => (
+const TimePeriodButton = ({ period, isSelected, onClick }) => (
   <button
     onClick={() => onClick(period.key)}
     className={`px-2 py-1 text-xs rounded transition-all ${
-      isSelected ? 'bg-gray-700 text-white border border-gray-600' 
-      : 'text-gray-400 hover:text-white hover:bg-gray-800'
+      isSelected ? 'bg-primary text-primary-foreground border border-border' 
+      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
     }`}
     aria-pressed={isSelected}
     aria-label={`Select ${period.label} time period`}
   >
     {period.label}
   </button>
-));
+);
 
 // Main Portfolio Return component
 const PortfolioReturn = () => {
@@ -50,14 +50,14 @@ const PortfolioReturn = () => {
   }, []);
 
   return (
-    <Card className="bg-primary/7 p-5 w-150 max-w-4xl h-[280px] flex flex-col" role="region" aria-labelledby="portfolio-return-title">
+    <Card className="bg-card p-3 w-150 max-w-4xl h-[280px] flex flex-col" role="region" aria-labelledby="portfolio-return-title">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h2 id="portfolio-return-title" className="text-sm text-gray-400 uppercase tracking-wide">
+        <h2 id="portfolio-return-title" className="text-sm text-muted-foreground uppercase tracking-wide">
           Portfolio Return
         </h2>
         
-        <div className="flex gap-1 border-2 rounded-sm" role="tablist" aria-label="Time period selection">
+        <div className="flex gap-1 border-2 border-border rounded-sm" role="tablist" aria-label="Time period selection">
           {timePeriods.map((period) => (
             <TimePeriodButton
               key={period.key}
@@ -72,7 +72,7 @@ const PortfolioReturn = () => {
       {/* Chart */}
       <div className="flex-1 relative">
         {/* Y-axis Labels - Positioned correctly with 0 at bottom */}
-        <div className="absolute left-0 top-0 h-40 flex flex-col justify-between text-xs text-gray-500 py-2 z-10 w-12">
+        <div className="absolute left-0 top-0 h-40 flex flex-col justify-between text-xs text-muted-foreground py-2 z-10 w-12">
           {reversedYAxisLabels.map((label, i) => (
             <span key={i} aria-label={`Chart scale: ${label}`} className="leading-none">
               {label}
@@ -83,8 +83,8 @@ const PortfolioReturn = () => {
         {/* Chart Container - Adjusted positioning */}
         <div className="h-full ml-12">
           {isLoading ? (
-            <div className="h-full animate-pulse bg-gray-800 rounded-lg flex items-center justify-center">
-              <div className="text-gray-600 text-sm">Loading chart...</div>
+            <div className="h-full animate-pulse bg-muted rounded-lg flex items-center justify-center">
+              <div className="text-muted-foreground text-sm">Loading chart...</div>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -98,17 +98,16 @@ const PortfolioReturn = () => {
                 }}
               >
                 <defs>
-                  {/* Area gradient - Vertical gradient for fill */}
-                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={chartConfig.strokeColor} stopOpacity={0.4} />
-                    <stop offset="50%" stopColor={chartConfig.strokeColor} stopOpacity={0.2} />
-                    <stop offset="100%" stopColor={chartConfig.strokeColor} stopOpacity={0.05} />
+                  {/* Area fill - Solid color instead of gradient */}
+                  <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgb(74 222 128)" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="rgb(74 222 128)" stopOpacity={0.05} />
                   </linearGradient>
                   
-                  {/* Line gradient - Horizontal gradient for stroke */}
-                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor={chartConfig.strokeColor} stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="#34d399" stopOpacity={1} />
+                  {/* Line stroke - Solid color instead of gradient */}
+                  <linearGradient id="lineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="rgb(74 222 128)" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="rgb(74 222 128)" stopOpacity={1} />
                   </linearGradient>
                 </defs>
                 
@@ -117,9 +116,9 @@ const PortfolioReturn = () => {
                   <ReferenceLine 
                     key={tick}
                     y={tick} 
-                    stroke={chartConfig.gridColor} 
+                    stroke="hsl(var(--border))" 
                     strokeDasharray="1 1" 
-                    strokeOpacity={chartConfig.gridOpacity} 
+                    strokeOpacity={0.3} 
                   />
                 ))}
                 
@@ -128,7 +127,7 @@ const PortfolioReturn = () => {
                   dataKey="date" 
                   axisLine={false} 
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                   interval="preserveStartEnd"
                   height={5}
                   padding={{ left: 10, right: 10 }}
@@ -145,16 +144,16 @@ const PortfolioReturn = () => {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="url(#lineGradient)"
+                  stroke="url(#lineStroke)"
                   strokeWidth={chartConfig.strokeWidth}
-                  fill="url(#areaGradient)"
+                  fill="url(#areaFill)"
                   fillOpacity={1}
                   activeDot={{ 
                     r: 5, 
-                    stroke: chartConfig.strokeColor, 
+                    stroke: "rgb(74 222 128)", 
                     strokeWidth: 3, 
-                    fill: chartConfig.strokeColor,
-                    filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.7))'
+                    fill: "rgb(74 222 128)",
+                    filter: 'drop-shadow(0 0 8px rgb(74 222 128) / 0.3)'
                   }}
                 />
               </AreaChart>

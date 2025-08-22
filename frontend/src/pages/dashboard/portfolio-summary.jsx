@@ -6,12 +6,12 @@ import { portfolioSummary } from './PortfoliodummyData';
 
 const PortfolioSummary = () => {
   return (
-      <Card className="bg-primary/7 p-5 max-w-md">
-        <p className="text-sm uppercase tracking-wide">Current Value</p>
-        <Card className="bg-primary/7 p-4 ">
+      <Card className="bg-card p-3 h-[280px] flex flex-col">
+        <p className="text-sm uppercase tracking-wide text-muted-foreground mb-2">Current Value</p>
+        <Card className="bg-card p-3 flex-1">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <p className="text-3xl font-semibold">
+              <p className="text-3xl font-semibold text-card-foreground">
                 ${portfolioSummary.currentValue.toFixed(2)}
               </p>
               <p className="text-sm text-green-600 dark:text-green-400 font-medium">
@@ -25,18 +25,17 @@ const PortfolioSummary = () => {
             <Button
               variant="outline"
               size="sm"
-              className="bg-transparent mt-3 rounded-2xl border-gray-600 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all duration-200"
+              className="bg-transparent mt-3 rounded-2xl border-border hover:bg-muted hover:text-foreground transition-all duration-200"
             >
               See Details
             </Button>
           </div>
         </Card>
 
-        {/* Invested Value Section - Outside the sub-card */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-3">
           <div className="space-y-1">
-            <p className="text-sm uppercase tracking-wide">Invested Value</p>
-            <p className="text-xl font-semibold">
+            <p className="text-sm uppercase tracking-wide text-muted-foreground">Invested Value</p>
+            <p className="text-xl font-semibold text-card-foreground">
               ${portfolioSummary.investedValue.toFixed(2)}
             </p>
           </div>

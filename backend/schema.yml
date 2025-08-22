@@ -1,0 +1,2676 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /api/token/:
+    post:
+      operationId: api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: api_token_refresh_create
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /auth/google/callback/:
+    post:
+      operationId: auth_google_callback_create
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /expense/accounts/:
+    get:
+      operationId: expense_accounts_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountList'
+          description: ''
+    post:
+      operationId: expense_accounts_create
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Account'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+  /expense/accounts/{id}/:
+    get:
+      operationId: expense_accounts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    put:
+      operationId: expense_accounts_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Account'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    patch:
+      operationId: expense_accounts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAccount'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: ''
+    delete:
+      operationId: expense_accounts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /expense/accounts/{id}/set-default/:
+    put:
+      operationId: expense_accounts_set_default_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /expense/budget/:
+    get:
+      operationId: expense_budget_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetList'
+          description: ''
+    post:
+      operationId: expense_budget_create
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Budget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Budget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+          description: ''
+  /expense/budget/{id}/:
+    get:
+      operationId: expense_budget_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+          description: ''
+    put:
+      operationId: expense_budget_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Budget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Budget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+          description: ''
+    patch:
+      operationId: expense_budget_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBudget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBudget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBudget'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+          description: ''
+    delete:
+      operationId: expense_budget_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /expense/budget/{id}/utilization/:
+    get:
+      operationId: expense_budget_utilization_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetUtilization'
+          description: ''
+  /expense/budget/current/:
+    get:
+      operationId: expense_budget_current_retrieve
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+          description: ''
+  /expense/budget/summary/:
+    get:
+      operationId: expense_budget_summary_retrieve
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+          description: ''
+  /expense/scan/:
+    post:
+      operationId: expense_scan_create
+      description: Scan receipt and extract expense data
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /expense/transactions/:
+    get:
+      operationId: expense_transactions_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionList'
+          description: ''
+    post:
+      operationId: expense_transactions_create
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionCreate'
+          description: ''
+  /expense/transactions/{id}/:
+    get:
+      operationId: expense_transactions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+    put:
+      operationId: expense_transactions_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+    patch:
+      operationId: expense_transactions_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTransaction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTransaction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTransaction'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+    delete:
+      operationId: expense_transactions_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /expense/transactions/{id}/update-status/:
+    patch:
+      operationId: expense_transactions_update_status_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateTransactionStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateTransactionStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateTransactionStatus'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTransactionStatus'
+          description: ''
+  /expense/transactions/bulk/:
+    post:
+      operationId: expense_transactions_bulk_create
+      tags:
+      - expense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkTransactionCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkTransactionCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkTransactionCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkTransactionCreate'
+          description: ''
+  /expense/transactions/summary/:
+    get:
+      operationId: expense_transactions_summary_retrieve
+      tags:
+      - expense
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /portfolio/portfolio/:
+    get:
+      operationId: portfolio_portfolio_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PortfolioList'
+          description: ''
+    post:
+      operationId: portfolio_portfolio_create
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortfolioCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PortfolioCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PortfolioCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioCreate'
+          description: ''
+  /portfolio/portfolio/{id}/:
+    get:
+      operationId: portfolio_portfolio_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+    put:
+      operationId: portfolio_portfolio_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+    patch:
+      operationId: portfolio_portfolio_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPortfolio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPortfolio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPortfolio'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+    delete:
+      operationId: portfolio_portfolio_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /portfolio/portfolio/add-by-symbol/:
+    post:
+      operationId: portfolio_portfolio_add_by_symbol_create
+      description: |-
+        Add/merge a holding by stock symbol. This path performs:
+        Finnhub fetch -> Groq description -> Stock upsert -> Portfolio DCA merge -> Summary refresh
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/portfolio/bulk-add/:
+    post:
+      operationId: portfolio_portfolio_bulk_add_create
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Portfolio'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/portfolio/by-sector/:
+    get:
+      operationId: portfolio_portfolio_by_sector_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/portfolio/performance/:
+    get:
+      operationId: portfolio_portfolio_performance_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/portfolio/summary/:
+    get:
+      operationId: portfolio_portfolio_summary_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/portfolio/top-performers/:
+    get:
+      operationId: portfolio_portfolio_top_performers_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/portfolio/worst-performers/:
+    get:
+      operationId: portfolio_portfolio_worst_performers_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+          description: ''
+  /portfolio/stocks/:
+    get:
+      operationId: portfolio_stocks_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stock'
+          description: ''
+  /portfolio/stocks/{symbol}/:
+    get:
+      operationId: portfolio_stocks_retrieve
+      parameters:
+      - in: path
+        name: symbol
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+          description: ''
+  /portfolio/stocks/exchanges/:
+    get:
+      operationId: portfolio_stocks_exchanges_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+          description: ''
+  /portfolio/stocks/search/:
+    get:
+      operationId: portfolio_stocks_search_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+          description: ''
+  /portfolio/stocks/sectors/:
+    get:
+      operationId: portfolio_stocks_sectors_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+          description: ''
+  /portfolio/wishlist/:
+    get:
+      operationId: portfolio_wishlist_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WishlistList'
+          description: ''
+    post:
+      operationId: portfolio_wishlist_create
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WishlistCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WishlistCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WishlistCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WishlistCreate'
+          description: ''
+  /portfolio/wishlist/{stock__symbol}/:
+    get:
+      operationId: portfolio_wishlist_retrieve
+      parameters:
+      - in: path
+        name: stock__symbol
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wishlist'
+          description: ''
+    put:
+      operationId: portfolio_wishlist_update
+      parameters:
+      - in: path
+        name: stock__symbol
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wishlist'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Wishlist'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Wishlist'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wishlist'
+          description: ''
+    patch:
+      operationId: portfolio_wishlist_partial_update
+      parameters:
+      - in: path
+        name: stock__symbol
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWishlist'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWishlist'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWishlist'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wishlist'
+          description: ''
+    delete:
+      operationId: portfolio_wishlist_destroy
+      parameters:
+      - in: path
+        name: stock__symbol
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /portfolio/wishlist/{stock__symbol}/toggle-alerts/:
+    post:
+      operationId: portfolio_wishlist_toggle_alerts_create
+      parameters:
+      - in: path
+        name: stock__symbol
+        schema:
+          type: string
+        required: true
+      tags:
+      - portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToggleWishlistAlerts'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ToggleWishlistAlerts'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ToggleWishlistAlerts'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleWishlistAlerts'
+          description: ''
+  /portfolio/wishlist/alerts-ready/:
+    get:
+      operationId: portfolio_wishlist_alerts_ready_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WishlistList'
+          description: ''
+  /portfolio/wishlist/by-priority/:
+    get:
+      operationId: portfolio_wishlist_by_priority_retrieve
+      tags:
+      - portfolio
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WishlistList'
+          description: ''
+  /user/auth/delete-user/:
+    delete:
+      operationId: user_auth_delete_user_destroy
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /user/auth/login/:
+    post:
+      operationId: user_auth_login_create
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /user/auth/logout/:
+    post:
+      operationId: user_auth_logout_create
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /user/auth/register/:
+    post:
+      operationId: user_auth_register_create
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /user/auth/resend-verification/:
+    post:
+      operationId: user_auth_resend_verification_create
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /user/auth/verify-email/:
+    post:
+      operationId: user_auth_verify_email_create
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        type:
+          $ref: '#/components/schemas/Type2d2Enum'
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          default: '0.00'
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - updated_at
+    AccountList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/Type2d2Enum'
+          readOnly: true
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        is_default:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - balance
+      - created_at
+      - id
+      - is_default
+      - name
+      - type
+      - updated_at
+    BlankEnum:
+      enum:
+      - ''
+    Budget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+        current_month_expenses:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        budget_utilization_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        last_alert_sent:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - budget_utilization_percentage
+      - created_at
+      - current_month_expenses
+      - id
+      - last_alert_sent
+      - updated_at
+    BudgetList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        current_month_expenses:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        budget_utilization_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        last_alert_sent:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - budget_utilization_percentage
+      - created_at
+      - current_month_expenses
+      - id
+      - last_alert_sent
+      - updated_at
+    BudgetUtilization:
+      type: object
+      properties:
+        budget_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        current_month_expenses:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        budget_utilization_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        remaining_budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        days_left_in_month:
+          type: integer
+          readOnly: true
+        average_daily_spending:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        projected_monthly_spending:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        is_over_budget:
+          type: boolean
+          readOnly: true
+        alert_threshold_reached:
+          type: boolean
+          readOnly: true
+        category_breakdown:
+          type: array
+          items: {}
+          readOnly: true
+        spending_trend:
+          type: string
+          readOnly: true
+      required:
+      - alert_threshold_reached
+      - average_daily_spending
+      - budget_amount
+      - budget_utilization_percentage
+      - category_breakdown
+      - current_month_expenses
+      - days_left_in_month
+      - is_over_budget
+      - projected_monthly_spending
+      - remaining_budget
+      - spending_trend
+    BulkTransactionCreate:
+      type: object
+      properties:
+        csv_file:
+          type: string
+          format: uri
+      required:
+      - csv_file
+    CategoryEnum:
+      enum:
+      - SALARY
+      - BUSINESS
+      - INVESTMENT
+      - FREELANCE
+      - RENTAL
+      - BONUS
+      - REFUND
+      - GIFT
+      - FOOD
+      - GROCERIES
+      - TRANSPORT
+      - FUEL
+      - BILLS
+      - RENT
+      - INSURANCE
+      - HEALTHCARE
+      - SHOPPING
+      - CLOTHING
+      - ENTERTAINMENT
+      - EDUCATION
+      - TRAVEL
+      - FITNESS
+      - PERSONAL_CARE
+      - SUBSCRIPTIONS
+      - SAVINGS
+      - INVESTMENTS
+      - LOAN_PAYMENT
+      - CREDIT_CARD
+      - BANK_FEES
+      - TAXES
+      - CHILDCARE
+      - PET_CARE
+      - CHARITY
+      - GIFTS_GIVEN
+      - HOME_IMPROVEMENT
+      - MAINTENANCE
+      - OTHER
+      type: string
+      description: |-
+        * `SALARY` - Salary
+        * `BUSINESS` - Business Income
+        * `INVESTMENT` - Investment Returns
+        * `FREELANCE` - Freelance/Consulting
+        * `RENTAL` - Rental Income
+        * `BONUS` - Bonus/Commission
+        * `REFUND` - Refunds
+        * `GIFT` - Gifts Received
+        * `FOOD` - Food & Dining
+        * `GROCERIES` - Groceries
+        * `TRANSPORT` - Transportation
+        * `FUEL` - Fuel/Gas
+        * `BILLS` - Bills & Utilities
+        * `RENT` - Rent/Mortgage
+        * `INSURANCE` - Insurance
+        * `HEALTHCARE` - Healthcare
+        * `SHOPPING` - Shopping
+        * `CLOTHING` - Clothing & Accessories
+        * `ENTERTAINMENT` - Entertainment
+        * `EDUCATION` - Education
+        * `TRAVEL` - Travel
+        * `FITNESS` - Fitness & Sports
+        * `PERSONAL_CARE` - Personal Care
+        * `SUBSCRIPTIONS` - Subscriptions
+        * `SAVINGS` - Savings
+        * `INVESTMENTS` - Investments
+        * `LOAN_PAYMENT` - Loan Payments
+        * `CREDIT_CARD` - Credit Card Payment
+        * `BANK_FEES` - Bank Fees
+        * `TAXES` - Taxes
+        * `CHILDCARE` - Childcare
+        * `PET_CARE` - Pet Care
+        * `CHARITY` - Charity/Donations
+        * `GIFTS_GIVEN` - Gifts Given
+        * `HOME_IMPROVEMENT` - Home Improvement
+        * `MAINTENANCE` - Maintenance & Repairs
+        * `OTHER` - Other
+    NullEnum:
+      enum:
+      - null
+    PatchedAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        type:
+          $ref: '#/components/schemas/Type2d2Enum'
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          default: '0.00'
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedBudget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+        current_month_expenses:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        budget_utilization_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        last_alert_sent:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedPortfolio:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        stock:
+          type: string
+          format: uuid
+        stock_symbol:
+          type: string
+          readOnly: true
+        stock_name:
+          type: string
+          readOnly: true
+        shares_owned:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        purchase_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        purchase_date:
+          type: string
+          format: date
+        total_invested:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        target_allocation_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        investment_thesis:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        current_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        unrealized_gain_loss:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        unrealized_gain_loss_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        day_change_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        sector:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/Type65dEnum'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        date:
+          type: string
+          format: date-time
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        receipt_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        is_recurring:
+          type: boolean
+        recurring_interval:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/RecurringIntervalEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        next_recurring_date:
+          type: string
+          format: date-time
+          nullable: true
+        last_processed:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        account:
+          type: string
+          format: uuid
+        account_name:
+          type: string
+          readOnly: true
+        account_type:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUpdateTransactionStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+    PatchedWishlist:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        stock:
+          type: string
+          format: uuid
+        stock_symbol:
+          type: string
+          readOnly: true
+        stock_name:
+          type: string
+          readOnly: true
+        stock_current_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        target_buy_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        price_when_added:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+        planned_investment_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          nullable: true
+        email_alerts_enabled:
+          type: boolean
+        priority:
+          type: integer
+          maximum: 10
+          minimum: 1
+        notes:
+          type: string
+          nullable: true
+        watch_reason:
+          type: string
+          nullable: true
+          maxLength: 200
+        is_active:
+          type: boolean
+          default: true
+        price_change_since_added:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        price_change_percentage_since_added:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        distance_to_target:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        distance_to_target_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        should_trigger_alert:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Portfolio:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        stock:
+          type: string
+          format: uuid
+        stock_symbol:
+          type: string
+          readOnly: true
+        stock_name:
+          type: string
+          readOnly: true
+        shares_owned:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        purchase_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        purchase_date:
+          type: string
+          format: date
+        total_invested:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        target_allocation_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        investment_thesis:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        current_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        unrealized_gain_loss:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        unrealized_gain_loss_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        day_change_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        sector:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - current_value
+      - day_change_value
+      - id
+      - purchase_date
+      - purchase_price
+      - sector
+      - shares_owned
+      - stock
+      - stock_name
+      - stock_symbol
+      - total_invested
+      - unrealized_gain_loss
+      - unrealized_gain_loss_percentage
+      - updated_at
+    PortfolioCreate:
+      type: object
+      properties:
+        stock:
+          type: string
+          format: uuid
+        shares_owned:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        purchase_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        purchase_date:
+          type: string
+          format: date
+        target_allocation_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        investment_thesis:
+          type: string
+          nullable: true
+      required:
+      - purchase_date
+      - purchase_price
+      - shares_owned
+      - stock
+    PortfolioList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        stock:
+          type: string
+          format: uuid
+          readOnly: true
+        stock_symbol:
+          type: string
+          readOnly: true
+        stock_name:
+          type: string
+          readOnly: true
+        shares_owned:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        purchase_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        purchase_date:
+          type: string
+          format: date
+          readOnly: true
+        total_invested:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        current_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        unrealized_gain_loss:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        unrealized_gain_loss_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        day_change_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,18}(?:\.\d{0,2})?$
+          readOnly: true
+        sector:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - current_value
+      - day_change_value
+      - id
+      - is_active
+      - purchase_date
+      - purchase_price
+      - sector
+      - shares_owned
+      - stock
+      - stock_name
+      - stock_symbol
+      - total_invested
+      - unrealized_gain_loss
+      - unrealized_gain_loss_percentage
+      - updated_at
+    RecurringIntervalEnum:
+      enum:
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - YEARLY
+      type: string
+      description: |-
+        * `DAILY` - Daily
+        * `WEEKLY` - Weekly
+        * `MONTHLY` - Monthly
+        * `YEARLY` - Yearly
+    SectorEnum:
+      enum:
+      - TECH
+      - FIN
+      - HC
+      - IND
+      - CONS
+      - EN
+      - OTHER
+      type: string
+      description: |-
+        * `TECH` - Technology
+        * `FIN` - Financials
+        * `HC` - Healthcare
+        * `IND` - Industrials
+        * `CONS` - Consumer
+        * `EN` - Energy
+        * `OTHER` - Other
+    StatusEnum:
+      enum:
+      - PENDING
+      - COMPLETED
+      - FAILED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `COMPLETED` - Completed
+        * `FAILED` - Failed
+    Stock:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        symbol:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 200
+        exchange:
+          type: string
+          maxLength: 20
+        sector:
+          $ref: '#/components/schemas/SectorEnum'
+        current_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        previous_close:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        market_cap:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        website_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
+        price_last_updated:
+          type: string
+          format: date-time
+          readOnly: true
+        is_active:
+          type: boolean
+        day_change:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        day_change_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - day_change
+      - day_change_percentage
+      - exchange
+      - id
+      - name
+      - price_last_updated
+      - symbol
+      - updated_at
+    ToggleWishlistAlerts:
+      type: object
+      properties:
+        email_alerts_enabled:
+          type: boolean
+      required:
+      - email_alerts_enabled
+    TokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - email
+      - password
+      - refresh
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/Type65dEnum'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        date:
+          type: string
+          format: date-time
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        receipt_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        is_recurring:
+          type: boolean
+        recurring_interval:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/RecurringIntervalEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        next_recurring_date:
+          type: string
+          format: date-time
+          nullable: true
+        last_processed:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        account:
+          type: string
+          format: uuid
+        account_name:
+          type: string
+          readOnly: true
+        account_type:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - account
+      - account_name
+      - account_type
+      - amount
+      - created_at
+      - date
+      - id
+      - last_processed
+      - type
+      - updated_at
+    TransactionCreate:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/Type65dEnum'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        date:
+          type: string
+          format: date-time
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        receipt_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        is_recurring:
+          type: boolean
+        recurring_interval:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/RecurringIntervalEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        account:
+          type: string
+          format: uuid
+      required:
+      - account
+      - amount
+      - date
+      - type
+    TransactionList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/Type65dEnum'
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+          nullable: true
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          readOnly: true
+        receipt_url:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+        is_recurring:
+          type: boolean
+          readOnly: true
+        recurring_interval:
+          readOnly: true
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/RecurringIntervalEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        next_recurring_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        account:
+          type: string
+          format: uuid
+          readOnly: true
+        account_name:
+          type: string
+          readOnly: true
+        account_type:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - account
+      - account_name
+      - account_type
+      - amount
+      - category
+      - created_at
+      - date
+      - description
+      - id
+      - is_recurring
+      - next_recurring_date
+      - receipt_url
+      - recurring_interval
+      - status
+      - type
+      - updated_at
+    Type2d2Enum:
+      enum:
+      - CURRENT
+      - SAVINGS
+      type: string
+      description: |-
+        * `CURRENT` - Current Account
+        * `SAVINGS` - Savings Account
+    Type65dEnum:
+      enum:
+      - INCOME
+      - EXPENSE
+      type: string
+      description: |-
+        * `INCOME` - Income
+        * `EXPENSE` - Expense
+    UpdateTransactionStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - status
+    Wishlist:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        stock:
+          type: string
+          format: uuid
+        stock_symbol:
+          type: string
+          readOnly: true
+        stock_name:
+          type: string
+          readOnly: true
+        stock_current_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        target_buy_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        price_when_added:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+        planned_investment_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          nullable: true
+        email_alerts_enabled:
+          type: boolean
+        priority:
+          type: integer
+          maximum: 10
+          minimum: 1
+        notes:
+          type: string
+          nullable: true
+        watch_reason:
+          type: string
+          nullable: true
+          maxLength: 200
+        is_active:
+          type: boolean
+          default: true
+        price_change_since_added:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        price_change_percentage_since_added:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        distance_to_target:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        distance_to_target_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        should_trigger_alert:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - distance_to_target
+      - distance_to_target_percentage
+      - id
+      - price_change_percentage_since_added
+      - price_change_since_added
+      - price_when_added
+      - should_trigger_alert
+      - stock
+      - stock_current_price
+      - stock_name
+      - stock_symbol
+      - target_buy_price
+      - updated_at
+    WishlistCreate:
+      type: object
+      properties:
+        stock:
+          type: string
+          format: uuid
+        target_buy_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+        planned_investment_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          nullable: true
+        email_alerts_enabled:
+          type: boolean
+        priority:
+          type: integer
+          maximum: 10
+          minimum: 1
+        notes:
+          type: string
+          nullable: true
+        watch_reason:
+          type: string
+          nullable: true
+          maxLength: 200
+      required:
+      - stock
+      - target_buy_price
+    WishlistList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        stock:
+          type: string
+          format: uuid
+          readOnly: true
+        stock_symbol:
+          type: string
+          readOnly: true
+        stock_name:
+          type: string
+          readOnly: true
+        stock_current_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        target_buy_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        planned_investment_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        email_alerts_enabled:
+          type: boolean
+          readOnly: true
+        priority:
+          type: integer
+          readOnly: true
+        watch_reason:
+          type: string
+          readOnly: true
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+        distance_to_target:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,11}(?:\.\d{0,4})?$
+          readOnly: true
+        distance_to_target_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,4})?$
+          readOnly: true
+        should_trigger_alert:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - distance_to_target
+      - distance_to_target_percentage
+      - email_alerts_enabled
+      - id
+      - is_active
+      - planned_investment_amount
+      - priority
+      - should_trigger_alert
+      - stock
+      - stock_current_price
+      - stock_name
+      - stock_symbol
+      - target_buy_price
+      - updated_at
+      - watch_reason
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
