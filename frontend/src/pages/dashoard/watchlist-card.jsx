@@ -1,9 +1,9 @@
-import React, { memo, useState } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { myWatchlistData, watchlistTabs } from './PortfoliodummyData';
 
-// Enhanced SVG Area Chart Component with Smooth Curves
-const MiniAreaChart = memo(({ data, isPositive }) => {
+// Enhanced SVG Area Chart Component with Solid Colors
+const MiniAreaChart = ({ data, isPositive }) => {
   const width = 80;
   const height = 30;
   const padding = 2;
@@ -46,32 +46,20 @@ const MiniAreaChart = memo(({ data, isPositive }) => {
   // Create area path (same as line but closed to bottom)
   const areaPath = linePath + ` L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
   
-  const strokeColor = isPositive ? '#10b981' : '#ef4444';
+  const strokeColor = isPositive ? 'hsl(var(--green-600))' : 'hsl(var(--red-600))';
   const fillColor = isPositive 
-    ? 'url(#greenGradient)' 
-    : 'url(#redGradient)';
+    ? 'hsl(var(--green-600) / 0.2)' 
+    : 'hsl(var(--red-600) / 0.2)';
 
   return (
     <svg width={width} height={height} className="overflow-visible">
-      {/* Define gradients */}
-      <defs>
-        <linearGradient id="greenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#10b981', stopOpacity: 0.3 }} />
-          <stop offset="100%" style={{ stopColor: '#10b981', stopOpacity: 0.05 }} />
-        </linearGradient>
-        <linearGradient id="redGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#ef4444', stopOpacity: 0.3 }} />
-          <stop offset="100%" style={{ stopColor: '#ef4444', stopOpacity: 0.05 }} />
-        </linearGradient>
-      </defs>
-      
-      {/* Area fill */}
+      {/* Area fill with solid color */}
       <path
         d={areaPath}
         fill={fillColor}
       />
       
-      {/* Line stroke */}
+      {/* Line stroke with solid color */}
       <path
         d={linePath}
         fill="none"
@@ -81,61 +69,61 @@ const MiniAreaChart = memo(({ data, isPositive }) => {
       />
     </svg>
   );
-});
+};
 
 // Tab Button Component
-const TabButton = memo(({ tab, isActive, onClick }) => (
+const TabButton = ({ tab, isActive, onClick }) => (
   <button
     onClick={() => onClick(tab.key)}
     className={`px-3 py-1.5 text-xs rounded transition-all ${
       isActive 
-        ? 'bg-gray-600 text-white' 
-        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+        ? 'bg-primary text-primary-foreground' 
+        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
     }`}
     aria-pressed={isActive}
   >
     {tab.label}
   </button>
-));
+);
 
 // Watchlist Row Component
-const WatchlistRow = memo(({ stock, index, isLast }) => {
+const WatchlistRow = ({ stock, index, isLast }) => {
   const isPositive = stock.change >= 0;
   
   return (
-    <div className={`flex items-center justify-between py-2 ${!isLast ? 'border-b border-gray-800' : ''}`}> {/* Changed py-3 to py-2 */}
+    <div className={`flex items-center justify-between py-2 ${!isLast ? 'border-b border-border' : ''}`}>
       {/* Company Info */}
-      <div className="flex items-center space-x-2 flex-1"> {/* Changed space-x-3 to space-x-2 */}
-        <div className="w-7 h-7 bg-gray-700 rounded-full flex items-center justify-center"> {/* Changed from w-8/h-8 to w-7/h-7 */}
-          <span className="text-xs font-medium text-white">
+      <div className="flex items-center space-x-2 flex-1">
+        <div className="w-7 h-7 bg-muted rounded-full flex items-center justify-center">
+          <span className="text-xs font-medium text-foreground">
             {stock.id.charAt(0)}
           </span>
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium text-white">{stock.id}</p>
-          <p className="text-xs text-gray-400">{stock.name}</p>
+          <p className="text-sm font-medium text-foreground">{stock.id}</p>
+          <p className="text-xs text-muted-foreground">{stock.name}</p>
         </div>
       </div>
 
       {/* Chart and Change */}
-      <div className="flex items-center space-x-3"> {/* Changed space-x-4 to space-x-3 */}
+      <div className="flex items-center space-x-3">
         <div className="flex items-center justify-center">
           <MiniAreaChart data={stock.chartData} isPositive={isPositive} />
         </div>
 
         <div className="text-right min-w-[80px]">
-          <p className="text-gray-400 text-xs mb-0.5">Change</p> {/* Changed mb-1 to mb-0.5 */}
-          <p className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+          <p className="text-muted-foreground text-xs mb-0.5">Change</p>
+          <p className={`text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {isPositive ? '+' : ''}{stock.change.toFixed(2)}%
           </p>
         </div>
       </div>
     </div>
   );
-});
+};
 
 // Main Component
-const MyWatchlist = memo(() => {
+const MyWatchlist = () => {
   const [activeTab, setActiveTab] = useState('all');
   
   // Get the maximum number of rows for consistent height
@@ -158,15 +146,15 @@ const MyWatchlist = memo(() => {
   const emptyRowsCount = maxRows - filteredData.length;
 
   return (
-    <Card className="bg-primary/7 h-90 p-5 w-full" role="region" aria-labelledby="my-watchlist-title">
+    <Card className="bg-card h-90 p-3 w-full" role="region" aria-labelledby="my-watchlist-title">
       {/* Header */}
       <div className="flex items-center justify-between ">
-        <h3 id="my-watchlist-title" className="text-base font-semibold text-white">
+        <h3 id="my-watchlist-title" className="text-base font-semibold text-card-foreground">
           My Watchlist
         </h3>
         
         {/* Tab Navigation */}
-        <div className="flex gap-1 border-2 rounded-sm">
+        <div className="flex gap-1 border-2 border-border rounded-sm">
           {watchlistTabs.map((tab) => (
             <TabButton
               key={tab.key}
@@ -194,7 +182,7 @@ const MyWatchlist = memo(() => {
           Array(emptyRowsCount).fill(null).map((_, index) => (
             <div 
               key={`empty-${index}`} 
-              className={`h-[52px] ${index !== emptyRowsCount - 1 ? 'border-b border-gray-800' : ''}`}
+              className={`h-[52px] ${index !== emptyRowsCount - 1 ? 'border-b border-border' : ''}`}
             />
           ))
         )}
@@ -202,16 +190,15 @@ const MyWatchlist = memo(() => {
         {/* Empty State - Maintains full height */}
         {filteredData.length === 0 && (
           <div 
-            className="flex items-center justify-center border-t border-gray-800" 
+            className="flex items-center justify-center border-t border-border" 
             style={{ height: `${maxRows * 52}px` }}
           >
-            <p className="text-gray-400">No stocks found for this filter</p>
+            <p className="text-muted-foreground">No stocks found for this filter</p>
           </div>
         )}
       </div>
     </Card>
   );
-});
+};
 
-MyWatchlist.displayName = 'MyWatchlist';
 export default MyWatchlist;

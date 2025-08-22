@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Settings, LogOut, ChevronDown, Menu, X } from 'lucide-react';
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
+// import ModeToggle from './components/mode-toggler';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', href: '/dashboard' },
@@ -43,7 +44,7 @@ const getUserInitials = (username) => {
   return words.map(word => word[0]).join('').slice(0, 2).toUpperCase();
 };
 
-const NavLink = memo(({ item, isActive, onClick, isMobile }) => (
+const NavLink = ({ item, isActive, onClick, isMobile }) => (
   <motion.div {...(isMobile && { initial: { opacity: 0, x: -20 }, animate: { opacity: 1, x: 0 } })}>
     <Link
       to={item.href}
@@ -54,9 +55,9 @@ const NavLink = memo(({ item, isActive, onClick, isMobile }) => (
       {item.name}
     </Link>
   </motion.div>
-));
+);
 
-const UserDropdown = memo(({ user, onLogout }) => {
+const UserDropdown = ({ user, onLogout }) => {
   const initials = useMemo(() => getUserInitials(user?.username), [user?.username]);
   
   return (
@@ -105,9 +106,9 @@ const UserDropdown = memo(({ user, onLogout }) => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-});
+};
 
-const MobileToggle = memo(({ isOpen, onClick }) => (
+const MobileToggle = ({ isOpen, onClick }) => (
   <button
     className="md:hidden p-2 rounded-lg transition-colors hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-primary"
     onClick={onClick}
@@ -120,9 +121,9 @@ const MobileToggle = memo(({ isOpen, onClick }) => (
       </motion.div>
     </AnimatePresence>
   </button>
-));
+);
 
-const Navbar = memo(() => {
+const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { pathname } = useLocation();
   const { user, logout } = useAuth();
@@ -148,7 +149,7 @@ const Navbar = memo(() => {
     return (
       <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95">
         <div className="container mx-auto px-4 h-16 flex items-center justify-center">
-          <div className="text-muted-foreground">Loading...</div>
+          <div className="text-muted-foreground">Please log in to continue</div>
         </div>
       </nav>
     );
@@ -172,6 +173,7 @@ const Navbar = memo(() => {
           </nav>
 
           <div className="flex items-center space-x-4">
+            
             <UserDropdown user={user} onLogout={handleLogout} />
             <MobileToggle isOpen={isMobileMenuOpen} onClick={toggleMobileMenu} />
           </div>
@@ -212,7 +214,6 @@ const Navbar = memo(() => {
       </div>
     </nav>
   );
-});
+};
 
-Navbar.displayName = 'Navbar';
 export default Navbar;

@@ -4,13 +4,13 @@ import { Card } from '@/components/ui/card';
 const MarketCard = memo(() => {
   return (
     <Card 
-      className="bg-primary/7 p-6 w-full min-h-[200px]" 
+      className="bg-card p-3 w-full min-h-[200px]" 
       role="region" 
       aria-labelledby="market-section-title"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 id="market-section-title" className="text-lg font-semibold text-white">
+        <h3 id="market-section-title" className="text-lg font-semibold text-card-foreground">
           Market
         </h3>
         
@@ -21,8 +21,8 @@ const MarketCard = memo(() => {
       </div>
 
       {/* Empty Content Area - Ready for future implementation */}
-      <div className="flex items-center justify-center h-32 border-2 border-dashed border-gray-700 rounded-lg">
-        <p className="text-gray-500 text-sm">Market content coming soon...</p>
+      <div className="flex items-center justify-center h-32 border-2 border-dashed border-border rounded-lg">
+        <p className="text-muted-foreground text-sm">Market content coming soon...</p>
       </div>
 
       {/* Alternative: Completely empty content area */}

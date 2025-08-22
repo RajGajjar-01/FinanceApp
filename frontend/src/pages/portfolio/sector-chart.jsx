@@ -122,110 +122,105 @@ function SectorBarChart() {
 
   if (loading) {
     return (
-      <div className="w-full max-w-2xl">
-        <Card>
-          <CardHeader>
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </CardHeader>
-        </Card>
-      </div>
+      <Card className="bg-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Portfolio by Sector</CardTitle>
+          <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-40">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full max-w-2xl">
-        <Card>
-          <CardHeader>
-            <div>
-              <CardTitle>Portfolio by Sector</CardTitle>
-              <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ErrorState error={error} onRetry={fetchPortfolioData} />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="bg-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Portfolio by Sector</CardTitle>
+          <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ErrorState error={error} onRetry={fetchPortfolioData} />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full max-w-2xl space-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Portfolio by Sector</CardTitle>
-              <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
-            </div>
+    <Card className="bg-card">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">Portfolio by Sector</CardTitle>
+        <CardDescription>Sector allocation breakdown - Current portfolio</CardDescription>
+      </CardHeader>
+      
+      <CardContent>
+        {data.length === 0 && (
+          <div className="h-40 flex items-center justify-center text-muted-foreground">
+            <p>No sector data available</p>
           </div>
-        </CardHeader>
+        )}
         
-        <CardContent>
-          {data.length === 0 && (
-            <div className="h-80 flex items-center justify-center text-muted-foreground">
-              <p>No sector data available</p>
-            </div>
-          )}
-          
-          {data.length > 0 && (
-            <ChartContainer config={chartConfig} className="h-80">
-              <BarChart
-                accessibilityLayer
-                data={data}
-                layout="vertical"
-                margin={{ left: 20, right: 20 }}
-                barCategoryGap="5%"
-              >
-                <XAxis type="number" dataKey="value" hide />
-                <YAxis
-                  dataKey="sector"
-                  type="category"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  width={100}
-                  tickFormatter={(value) => value.length > 15 ? value.slice(0, 15) + '...' : value}
-                  fontSize={14}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      hideLabel
-                      formatter={(value, name, props) => {
-                        if (!props.payload?.hasData || value === null) return null;
-                        return [`${value.toFixed(1)}%`, 'Allocation'];
-                      }}
-                    />
-                  }
-                />
-                <Bar
-                  dataKey="value"
-                  fill="var(--color-value)"
-                  radius={[0, 5, 5, 0]}
-                  opacity={0.8}
-                  barSize={20}
-                />
-              </BarChart>
-            </ChartContainer>
-          )}
-        </CardContent>
-        
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            <span className={isPositiveGain ? 'text-green-600' : 'text-red-600'}>
-              {isPositiveGain ? 'Up' : 'Down'} {Math.abs(totalGainLossPercentage).toFixed(1)}% overall
-            </span>
-            <TrendingUp className={`h-4 w-4 ${isPositiveGain ? 'text-green-600' : 'text-red-600 rotate-180'}`} />
-          </div>
-          <div className="leading-none text-muted-foreground">
-            {portfolioData?.number_of_holdings || 0} holdings across {activeSectors} active sectors
-          </div>
-        </CardFooter>
-      </Card>
-    </div>
+        {data.length > 0 && (
+          <ChartContainer config={chartConfig} className="h-40">
+            <BarChart
+              accessibilityLayer
+              data={data}
+              layout="vertical"
+              margin={{ left: 20, right: 20 }}
+              barCategoryGap="5%"
+            >
+              <XAxis type="number" dataKey="value" hide />
+              <YAxis
+                dataKey="sector"
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                width={100}
+                tickFormatter={(value) => value.length > 15 ? value.slice(0, 15) + '...' : value}
+                fontSize={14}
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    formatter={(value, name, props) => {
+                      if (!props.payload?.hasData || value === null) return null;
+                      return [`${value.toFixed(1)}%`, 'Allocation'];
+                    }}
+                  />
+                }
+              />
+              <Bar
+                dataKey="value"
+                fill="hsl(var(--primary))"
+                radius={[0, 5, 5, 0]}
+                opacity={0.8}
+                barSize={20}
+              />
+            </BarChart>
+          </ChartContainer>
+        )}
+      </CardContent>
+      
+      <CardFooter className="flex-col items-start gap-2 text-sm border-t border-border pt-3">
+        <div className="flex gap-2 font-medium leading-none">
+          <span className={isPositiveGain ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+            {isPositiveGain ? 'Up' : 'Down'} {Math.abs(totalGainLossPercentage).toFixed(1)}% overall
+          </span>
+          <TrendingUp className={`h-4 w-4 ${isPositiveGain ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400 rotate-180'}`} />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          {portfolioData?.number_of_holdings || 0} holdings across {activeSectors} active sectors
+        </div>
+      </CardFooter>
+    </Card>
   );
 }
 

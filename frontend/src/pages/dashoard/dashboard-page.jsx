@@ -12,9 +12,9 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-4 space-y-6">
+      <div className="container mx-auto px-4 py-4 space-y-4">
         {/* First Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-12 gap-6 max-w-full mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-12 gap-4 max-w-full mx-auto">
           <section className="lg:col-span-1 xl:col-span-4">
             <PortfolioSummary />
           </section>
@@ -22,7 +22,7 @@ const Dashboard = () => {
             <PortfolioReturn />
           </section>
           <section className="lg:col-span-1 xl:col-span-3">
-            <div className="space-y-6">
+            <div className="space-y-4">
               <TransactionOrderCard />
               <PurchaseQuantityCard />
             </div>
@@ -30,7 +30,7 @@ const Dashboard = () => {
         </div>
 
         {/* Second Row - Portfolio and Watchlist Cards (70% / 30% width) */}
-        <div className="grid grid-cols-1 xl:grid-cols-10 gap-6 max-w-full mx-auto">
+        <div className="grid grid-cols-1 xl:grid-cols-10 gap-4 max-w-full mx-auto">
           {/* My Portfolio Card (70% width) */}
           <section className="xl:col-span-6">
             <MyPortfolioCard />
