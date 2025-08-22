@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import { ModeToggle } from './mode-toggler';
+import StockSearch from './stock-search';
 
 const getNavItems = (pathname) => {
   const baseItems = [
@@ -203,7 +204,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-
+          {/* Left side - Logo */}
           <div className="flex items-center space-x-3">
             <Link 
               to="/dashboard" 
@@ -218,14 +219,19 @@ const Navbar = () => {
             )}
           </div>
 
+          {/* Center - Search Bar (hidden on mobile) */}
+          <div className="hidden lg:flex flex-1 max-w-md mx-8">
+            <StockSearch />
+          </div>
 
+          {/* Center - Navigation Items */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItemsWithState.map(item => (
               <NavLink key={item.href} item={item} isActive={item.isActive} />
             ))}
           </nav>
 
-
+          {/* Right side - Mode toggle, user dropdown, mobile menu */}
           <div className="flex items-center space-x-4">
             <ModeToggle />
             <UserDropdown user={user} onLogout={handleLogout} />
@@ -241,6 +247,11 @@ const Navbar = () => {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="md:hidden overflow-hidden border-t border-border/40 bg-background/95"
             >
+              {/* Mobile Search Bar */}
+              <div className="px-4 py-3 border-b border-border/40">
+                <StockSearch />
+              </div>
+              
               <motion.nav 
                 className="py-4 space-y-2 px-4"
                 initial={{ y: -20 }}

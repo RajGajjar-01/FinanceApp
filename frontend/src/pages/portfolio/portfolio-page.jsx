@@ -11,7 +11,7 @@ const Portfolio = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-4 space-y-6">
+      <div className="container mx-auto px-4 py-4 space-y-4">
         {/* Enhanced Portfolio Summary Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-card p-4">
@@ -85,22 +85,25 @@ const Portfolio = () => {
           <PortfolioPerformanceChart />
         </div>
 
-        {/* Main Content Grid - Enhanced Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-          {/* Portfolio Holdings Table - 2/4 width */}
+        {/* Row 3: Holdings Table - Full Width */}
+        <div className="w-full">
+          <PortfolioHoldingsTable />
+        </div>
+
+        {/* Row 4: Wishlist Table + Sector Chart Side by Side */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          {/* Wishlist Table - 2/3 width */}
           <div className="xl:col-span-2">
-            <PortfolioHoldingsTable />
-          </div>
-          
-          {/* Right Sidebar - 2/4 width with better organization */}
-          <div className="xl:col-span-2 space-y-6">
-            {/* Sector Allocation Chart */}
-            <SectorBarChart />
-            
-            {/* Wishlist Table */}
             <WishlistTable />
           </div>
+          
+          {/* Sector Chart - 1/3 width */}
+          <div className="xl:col-span-1">
+            <SectorBarChart />
+          </div>
         </div>
+
+        {/* Row 5: Removed - no longer needed */}
       </div>
     </>
   );

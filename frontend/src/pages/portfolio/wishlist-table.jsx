@@ -73,37 +73,33 @@ const WishlistTable = () => {
   };
 
   return (
-    <Card className="bg-card">
+    <Card className="bg-card h-full">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg text-card-foreground">Watchlist</CardTitle>
-        <CardDescription>Stocks you're monitoring</CardDescription>
+        <CardDescription>Stocks you're monitoring for potential investment opportunities</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[80px] text-muted-foreground">Symbol</TableHead>
-                <TableHead className="min-w-[120px] text-muted-foreground">Company</TableHead>
+                <TableHead className="w-[100px] text-muted-foreground">Symbol</TableHead>
+                <TableHead className="min-w-[160px] text-muted-foreground">Company</TableHead>
                 <TableHead className="text-right text-muted-foreground">Target</TableHead>
                 <TableHead className="text-right text-muted-foreground">Current</TableHead>
                 <TableHead className="text-right text-muted-foreground">Distance</TableHead>
                 <TableHead className="text-center text-muted-foreground">Priority</TableHead>
+                <TableHead className="text-center text-muted-foreground">Sector</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {wishlistData.map((item) => (
                 <TableRow key={item.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
-                    <div>
-                      <div className="font-semibold text-card-foreground">{item.symbol}</div>
-                      <Badge variant="secondary" className="text-xs mt-1">
-                        {item.sector}
-                      </Badge>
-                    </div>
+                    <div className="font-semibold text-card-foreground text-base">{item.symbol}</div>
                   </TableCell>
-                  <TableCell className="max-w-[120px]">
-                    <div className="truncate text-card-foreground" title={item.name}>
+                  <TableCell className="max-w-[160px]">
+                    <div className="truncate text-card-foreground font-medium" title={item.name}>
                       {item.name}
                     </div>
                   </TableCell>
@@ -114,7 +110,7 @@ const WishlistTable = () => {
                     ${item.currentPrice.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className={`font-medium ${item.distanceToTarget >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    <div className={`font-medium text-sm ${item.distanceToTarget >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {item.distanceToTarget >= 0 ? '+' : ''}${item.distanceToTarget.toFixed(2)}
                     </div>
                     <div className={`text-xs ${item.distanceToTarget >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -129,21 +125,34 @@ const WishlistTable = () => {
                       {item.priority}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="secondary" className="text-xs">
+                      {item.sector}
+                    </Badge>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
         
-        {/* Summary Footer */}
+        {/* Enhanced Summary Footer */}
         <div className="border-t border-border p-4 bg-muted/30">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">
-              {wishlistData.length} watchlist items
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-muted-foreground">
+                {wishlistData.length} watchlist items
+              </span>
+              <span className="text-muted-foreground">
+                • {wishlistData.filter(item => item.priority === 'High').length} high priority
+              </span>
+            </div>
             <div className="text-right">
               <div className="text-muted-foreground">
                 {wishlistData.filter(item => item.distanceToTarget <= 0).length} ready to buy
+              </div>
+              <div className="text-muted-foreground">
+                {wishlistData.filter(item => item.distanceToTarget > 0).length} waiting for price drop
               </div>
             </div>
           </div>
