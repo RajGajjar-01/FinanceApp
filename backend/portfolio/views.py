@@ -1,5 +1,6 @@
 from decimal import Decimal, InvalidOperation
 from django.db.models import Q, Count, Sum, Avg, F, Case, When, DecimalField
+from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, viewsets, filters, status
 from rest_framework.decorators import action
@@ -14,7 +15,11 @@ from .serializers import (
     PriceAlertListSerializer, UpdatePriceAlertStatusSerializer , AddToPortfolioBySymbolSerializer
 )
 from portfolio.services.portfolio_service import add_stock_to_portfolio_by_symbol
+from django.conf import settings
+import requests
 
+FINNHUB_SEARCH_URL = "https://finnhub.io/api/v1/search"
+FINNHUB_API_KEY = getattr(settings, "FINNHUB_API_KEY", None)
 
 class StockViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = StockSerializer
@@ -80,28 +85,53 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='search')
     def search(self, request):
-        try:
-            query = request.query_params.get('q', '').strip()
-            if not query:
-                return create_error_response(_("Search query required."), 
-                                           errors=[_("Please provide a search query")])
-            if len(query) < 2:
-                return create_error_response(_("Search query too short."), 
-                                           errors=[_("Search query must be at least 2 characters")])
-            
-            # Optimized search with database-level filtering
-            queryset = self.get_queryset().filter(
-                Q(name__icontains=query) | Q(symbol__icontains=query) | Q(sector__icontains=query)
-            ).only('id', 'name', 'symbol', 'sector', 'current_price', 'exchange')[:20]
-            
-            serializer = StockListSerializer(queryset, many=True)
-            message = _("Search results retrieved successfully.") if queryset else _("No stocks found for your search.")
-            
-            return create_success_response(message, data={
-                'results': serializer.data, 'count': len(serializer.data), 'query': query
-            })
-        except Exception as error:
-            return create_error_response(_("Search failed."), errors=[str(error)])
+        """
+        Search for stocks using Finnhub API and local database search.
+        """
+        query = request.query_params.get("query", request.query_params.get('q', '')).strip()
+        
+        if not query:
+            return create_error_response(_("Search query required."), errors=[_("Please provide a search query.")])
+
+        # First try Finnhub API search if API key is available
+        if FINNHUB_API_KEY:
+            try:
+                response = requests.get(
+                    FINNHUB_SEARCH_URL,
+                    params={"q": query, "token": FINNHUB_API_KEY},
+                    timeout=5
+                )
+                response.raise_for_status()
+                data = response.json()
+                results = data.get("result", [])
+                
+                if results:
+                    stocks = [{"symbol": item["symbol"], "name": item["description"]} for item in results]
+                    return create_success_response(_("Search results retrieved successfully."), 
+                                                 data={'results': stocks, 'count': len(stocks), 'query': query, 'source': 'finnhub'})
+            except requests.exceptions.RequestException:
+                # Fall back to database search if Finnhub fails
+                pass
+            except Exception:
+                # Fall back to database search for any other exception
+                pass
+        
+        # Fallback to database search (from second code)
+        if len(query) < 2:
+            return create_error_response(_("Search query too short."), 
+                                       errors=[_("Search query must be at least 2 characters")])
+        
+        # Optimized search with database-level filtering
+        queryset = self.get_queryset().filter(
+            Q(name__icontains=query) | Q(symbol__icontains=query) | Q(sector__icontains=query)
+        ).only('id', 'name', 'symbol', 'sector', 'current_price', 'exchange')[:20]
+        
+        serializer = StockListSerializer(queryset, many=True)
+        message = _("Search results retrieved successfully.") if queryset else _("No stocks found for your search.")
+        
+        return create_success_response(message, data={
+            'results': serializer.data, 'count': len(serializer.data), 'query': query, 'source': 'database'
+        })
 
     @action(detail=False, methods=['get'], url_path='sectors')
     def sectors(self, request):
@@ -142,6 +172,45 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
                                          data={'results': exchanges_data, 'count': len(exchanges_data)})
         except Exception as error:
             return create_error_response(_("Failed to retrieve exchanges."), errors=[str(error)])
+        
+    @action(detail=True, methods=['get'], url_path='latest')
+    def latest(self, request, symbol=None):
+        """
+        Get the latest stock data for a specific symbol.
+        """
+        try:
+            stock = self.get_queryset().filter(symbol=symbol).order_by("-price_last_updated").first()
+            if not stock:
+                return create_error_response(_("Stock data not found."), errors=[f"Symbol '{symbol}' does not exist."])
+            
+            serializer = self.get_serializer(stock)
+            return create_success_response(_("Latest stock data retrieved successfully."), data=serializer.data)
+        except Exception as error:
+            return create_error_response(_("Failed to retrieve latest stock data."), errors=[str(error)])
+ 
+    @action(detail=False, methods=['get'], url_path='details')
+    def get_stock_details(self, request):
+        symbol = request.GET.get("symbol")
+        if not symbol:
+            return JsonResponse({"error": "Symbol required"}, status=400)
+
+        try:
+            if not FINNHUB_API_KEY:
+                return JsonResponse({"error": "API key not configured"}, status=500)
+                
+            url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={FINNHUB_API_KEY}"
+            response = requests.get(url)
+            data = response.json()
+            print("Stock details response:", data)
+            # Finnhub quote API returns: c=current price, pc=previous close
+            return JsonResponse({
+                "symbol": symbol,
+                "name": symbol,  # You can add another API call for full name if needed
+                "currentPrice": data.get("c"),
+                "previousClose": data.get("pc")
+            })
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
 
 class PortfolioViewSet(viewsets.ModelViewSet):
@@ -363,7 +432,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
                              current_value=Sum(F('shares_owned') * F('stock__current_price'), output_field=DecimalField()),
                              avg_purchase_price=Avg('purchase_price')
                          )
-                         .order_by('stock__sector'))
+                         .order('stock__sector'))
             
             if not sector_data:
                 return create_success_response(_("No sector data found."), data={'results': [], 'count': 0})
