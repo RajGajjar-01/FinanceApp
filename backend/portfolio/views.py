@@ -19,7 +19,7 @@ from django.conf import settings
 import requests
 
 FINNHUB_SEARCH_URL = "https://finnhub.io/api/v1/search"
-FINNHUB_API_KEY = getattr(settings, "FINNHUB_API_KEY", None)
+FINHUB_API_KEY = getattr(settings, "FINHUB_API_KEY", None)
 
 class StockViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = StockSerializer
@@ -94,11 +94,11 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
             return create_error_response(_("Search query required."), errors=[_("Please provide a search query.")])
 
         # First try Finnhub API search if API key is available
-        if FINNHUB_API_KEY:
+        if FINHUB_API_KEY:
             try:
                 response = requests.get(
                     FINNHUB_SEARCH_URL,
-                    params={"q": query, "token": FINNHUB_API_KEY},
+                    params={"q": query, "token": FINHUB_API_KEY},
                     timeout=5
                 )
                 response.raise_for_status()
@@ -195,10 +195,10 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
             return JsonResponse({"error": "Symbol required"}, status=400)
 
         try:
-            if not FINNHUB_API_KEY:
+            if not FINHUB_API_KEY:
                 return JsonResponse({"error": "API key not configured"}, status=500)
                 
-            url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={FINNHUB_API_KEY}"
+            url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={FINHUB_API_KEY}"
             response = requests.get(url)
             data = response.json()
             print("Stock details response:", data)
