@@ -13,13 +13,25 @@ const StockSearch = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [error, setError] = useState('');
+  const [portfolio, setPortfolio] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   
   const { axiosPrivate } = useAuth();
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const debounceTimeoutRef = useRef(null);
 
-  // Debounced search function
+  // Utility function for getting cookies
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+  }
+
+  const accessToken = getCookie("access_token");
+
+  // Debounced search function using the first component's API approach
   const performSearch = useCallback(async (query) => {
     if (!query || query.length < 2) {
       setSearchResults([]);
@@ -31,23 +43,34 @@ const StockSearch = () => {
       setIsLoading(true);
       setError('');
       
-      const response = await axiosPrivate.get(`/portfolio/stocks/search/?q=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `http://localhost:8000/api/stocks/search/?query=${encodeURIComponent(query)}`,
+        {
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+        }
+      );
       
-      if (response.data?.success) {
-        setSearchResults(response.data.data.results || []);
+      if (!response.ok) throw new Error("Failed to fetch stock data");
+
+      const data = await response.json();
+
+      if (data.data && data.data.results && data.data.results.length > 0) {
+        setSearchResults(data.data.results);
         setIsOpen(true);
       } else {
         setSearchResults([]);
-        setError('Search failed');
+        setError('No stocks found');
       }
     } catch (err) {
       console.error('Search error:', err);
-      setError('Failed to search stocks');
+      setError('Unable to fetch stock data. Try again later.');
       setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
-  }, [axiosPrivate]);
+  }, [accessToken]);
 
   // Debounced search effect
   useEffect(() => {
@@ -133,16 +156,23 @@ const StockSearch = () => {
     inputRef.current?.focus();
   };
 
+  const addToPortfolio = (stock) => {
+    if (!portfolio.some((s) => s.symbol === stock.symbol)) {
+      setPortfolio([...portfolio, stock]);
+    }
+    clearSearch();
+  };
+
+  const addToWishlist = (stock) => {
+    if (!wishlist.some((s) => s.symbol === stock.symbol)) {
+      setWishlist([...wishlist, stock]);
+    }
+    clearSearch();
+  };
+
   const formatPrice = (price) => {
     if (!price) return 'N/A';
     return `$${parseFloat(price).toFixed(2)}`;
-  };
-
-  const getPriceChangeColor = (current, previous) => {
-    if (!current || !previous) return 'text-muted-foreground';
-    return parseFloat(current) >= parseFloat(previous) 
-      ? 'text-green-600 dark:text-green-400' 
-      : 'text-red-600 dark:text-red-400';
   };
 
   return (
@@ -204,7 +234,7 @@ const StockSearch = () => {
               <div className="max-h-80 overflow-y-auto">
                 {searchResults.map((stock, index) => (
                   <motion.div
-                    key={stock.id}
+                    key={stock.symbol}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.1, delay: index * 0.05 }}
@@ -230,13 +260,29 @@ const StockSearch = () => {
                       </div>
                     </div>
                     
-                    <div className="text-right ml-3">
-                      <div className="text-sm font-medium text-foreground">
-                        {formatPrice(stock.current_price)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {stock.exchange}
-                      </div>
+                    <div className="flex gap-2 ml-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToPortfolio(stock);
+                        }}
+                        className="h-7 px-2 text-xs"
+                      >
+                        Portfolio
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToWishlist(stock);
+                        }}
+                        className="h-7 px-2 text-xs"
+                      >
+                        Wishlist
+                      </Button>
                     </div>
                   </motion.div>
                 ))}
